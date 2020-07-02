@@ -14,18 +14,20 @@ public class FogController : MonoBehaviour
     // public int height = 15;
 
     // 包围盒的长宽高
-    public float containerWidth = 4.0f;
-    public float containerDepth = 0.8f;
-    public float containerHeight = 4.0f;
+    // public float containerWidth = 100.0f;
+    // public float containerDepth = 0.8f;
+    // public float containerHeight = 4.0f;
+    public Vector3 center = Vector3.zero;
+    public Vector3 maxSize = new Vector3(10.0f, 10.0f, 10.0f);
+    private float unitSize = 0.2f;
     // 烟雾源实例
     public FogModel model;
     public int m_velocityUpdateMethod = 0;
-
     private List<GameObject> particleGameobjects = new List<GameObject>();
-
     private Transform particleParent;
-
     private int generateIndex = 0;
+
+    public int[][][] density;
 
     void Awake() {
         if (instance != null)
@@ -69,10 +71,10 @@ public class FogController : MonoBehaviour
         Debug.Log("Initialize fluid particles");
         model = new FogModel();
 
-        float diam = 2.0f * particleRadius;
-        float startX = -0.5f * containerWidth + diam;
-        float startY = diam;
-        float startZ = -0.5f * containerDepth + diam;
+        // float diam = 2.0f * particleRadius;
+        // float startX = -0.5f * containerWidth + diam;
+        // float startY = diam;
+        // float startZ = -0.5f * containerDepth + diam;
         float yshift = Mathf.Sqrt(3) * particleRadius;
 
         List<Vector3> fluidParticles = new List<Vector3>();
@@ -94,6 +96,8 @@ public class FogController : MonoBehaviour
         //         }
         //     }
         // }
+
+        InitDensity();
         
         model.setParticleRadius(particleRadius);
 
@@ -102,14 +106,34 @@ public class FogController : MonoBehaviour
         // Debug.Log("Number of particles: " + (width*height*depth).ToString());
     }
 
+    void InitDensity()
+    {
+        // Debug.Log((int)(maxSize.x/unitSize));
+        density = new int[(int)(maxSize.x/unitSize+1)][][];
+        for (int i = 0; i < (int)(maxSize.x/unitSize+1); i++)
+        {
+            density[i] = new int[(int)(maxSize.y/unitSize+1)][];
+            for (int j = 0; j < (int)(maxSize.y/unitSize+1); j++)
+            {
+                density[i][j] = new int[(int)(maxSize.z/unitSize+1)];
+            }
+        }
+    }
+
     void InitBoundary()
     {
-        float x1 = -containerWidth / 2.0f;
-        float x2 = containerWidth / 2.0f;
-        float y1 = 0.0f;
-        float y2 = containerHeight;
-        float z1 = -containerDepth / 2.0f;
-        float z2 = containerDepth / 2.0f;
+        // float x1 = -containerWidth / 2.0f;
+        // float x2 = containerWidth / 2.0f;
+        // float y1 = 0.0f;
+        // float y2 = containerHeight;
+        // float z1 = -containerDepth / 2.0f;
+        // float z2 = containerDepth / 2.0f;
+        float x1 = center.x - maxSize.x / 2.0f;
+        float x2 = center.x + maxSize.x / 2.0f;
+        float y1 = center.y - maxSize.y / 2.0f;
+        float y2 = center.y + maxSize.y / 2.0f;
+        float z1 = center.z - maxSize.z / 2.0f;
+        float z2 = center.z + maxSize.z / 2.0f;
 
         float diam = 2.0f * particleRadius;
 
@@ -178,7 +202,20 @@ public class FogController : MonoBehaviour
             Vector3 position = pd.GetPosition(i) + h * pd.GetVelocity(i);
             pd.SetPosition(i, position);
             particleGameobjects[i].transform.position = position;
+            
+            Vector3 delta = position - center;
+            if (delta.x > maxSize.x/2 || delta.x < -maxSize.x/2 || 
+                delta.y > maxSize.y/2 || delta.y < -maxSize.y/2 ||
+                delta.z > maxSize.z/2 || delta.z < -maxSize.z/2)
+            {
+                model.DeleteParticle(i);
+                Destroy(particleGameobjects[i]);
+                particleGameobjects.RemoveAt(i);
+                i = i - 1;
+            }
         }
+
+        UpdateDensity();
 
         // neighborhood search
         model.m_neighborhoodSearch.neighborhoodSearch(
@@ -211,12 +248,12 @@ public class FogController : MonoBehaviour
 
     void GenerateParticle()
     {
-        float diam = 2.0f * particleRadius;
-        float startX = -0.5f * containerWidth + diam;
-        float startY = diam;
-        float startZ = -0.5f * containerDepth + diam;
+        // float diam = 2.0f * particleRadius;
+        // float startX = -0.5f * containerWidth + diam;
+        // float startY = diam;
+        // float startZ = -0.5f * containerDepth + diam;
 
-        Vector3 position = new Vector3(startX, startY, startZ);
+        Vector3 position = center;
         Vector3 velocity = 
             (new Vector3(
                 Random.Range(0.0f, 1.0f),
@@ -230,6 +267,32 @@ public class FogController : MonoBehaviour
         particle.transform.SetParent(particleParent);
         particleGameobjects.Add(particle);
         generateIndex++;
+    }
+
+    void UpdateDensity()
+    {
+        FogParticleData pd = model.particles;
+
+        // 清空
+        for (int i = 0; i < maxSize.x; i++)
+        {
+            for (int j = 0; j < maxSize.y; j++)
+            {
+                for (int k = 0; k < maxSize.z; k++)
+                {
+                    density[i][j][k] = 0;
+                }
+            }
+        }
+
+        for (int i = 0; i < pd.Size(); i++) 
+        {
+            Vector3 delta = pd.m_x[i] - center + maxSize/2.0f;
+            // Debug.Log((int)(delta.x/unitSize));
+            // Debug.Log((int)(delta.y/unitSize));
+            // Debug.Log((int)(delta.z/unitSize));
+            density[(int)(delta.x/unitSize)][(int)(delta.y/unitSize)][(int)(delta.z/unitSize)]++;
+        }
     }
 
     void ClearAccelerations()

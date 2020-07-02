@@ -48,6 +48,18 @@ public class FogParticleData
         m_a.Add(Vector3.zero);
     }
 
+    public void DeleteParticle(int index)
+    {
+        m_masses.RemoveAt(index);
+        m_invMasses.RemoveAt(index);
+        m_x0.RemoveAt(index);
+        m_x.RemoveAt(index);
+        m_v.RemoveAt(index);
+        m_a.RemoveAt(index);
+        m_oldX.RemoveAt(index);
+        m_lastX.RemoveAt(index);
+    }
+
     public Vector3 GetPosition(int i)
     {
         return m_x[i];

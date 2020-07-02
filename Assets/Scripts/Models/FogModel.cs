@@ -151,7 +151,10 @@ public class FogModel
 
     public void DeleteParticle(int index)
     {
-        
+        m_lambda.RemoveAt(index);
+        m_density.RemoveAt(index);
+        m_deltaX.RemoveAt(index);
+        particles.DeleteParticle(index);
     }
 
     public void setParticleRadius(float val) 

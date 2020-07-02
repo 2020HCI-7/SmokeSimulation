@@ -337,9 +337,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleRadius: 0.025
-  containerWidth: 4
-  containerDepth: 0.8
-  containerHeight: 4
+  center: {x: 0, y: 0, z: 0}
+  maxSize: {x: 1, y: 1, z: 1}
   m_velocityUpdateMethod: 0
 --- !u!1 &1201909839
 GameObject:
