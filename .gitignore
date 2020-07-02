@@ -56,4 +56,9 @@ sysinfo.txt
 *.unitypackage
 
 # Crashlytics generated file
+<<<<<<< HEAD
 crashlytics-build.properties
+=======
+crashlytics-build.properties
+
+>>>>>>> fdcb7d8c838804f7b09cfc46d8d364d4a1abd221
