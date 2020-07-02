@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
         Application.Quit();
     }
 
-    //methods configuration
+    //methods
     public void changeMode(GameMode _gameMode)
     {
         //configuration
@@ -69,7 +69,6 @@ public class GameManager : MonoBehaviour
         addLog("[mode] change mode to " + gameMode.ToString());
     }
     
-    //methods object
     public void setData(Data objectData)
     {
         //data
@@ -126,7 +125,6 @@ public class GameManager : MonoBehaviour
         data.Remove(index);
     }
 
-    //methods UI
     public void addLog(string line) 
     {
         logPanel.GetComponent<LogPanelController>().addLine(line);
