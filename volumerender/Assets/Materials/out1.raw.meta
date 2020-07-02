@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2a2bcda964cd39248a8b960568ee2f4c
+ScriptedImporter:
+  fileIDToRecycleName:
+    11700000: Volume
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 7fd08ae18e815473f866850973503b92, type: 3}
+  width: 512
+  height: 512
+  depth: 189
+  bit: 1
