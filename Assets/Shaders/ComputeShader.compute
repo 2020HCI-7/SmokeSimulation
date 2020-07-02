@@ -1,0 +1,95 @@
+﻿// #pragma kernel SetRadius
+
+// struct SetRadiusInputStruct
+// {
+//     float pi;
+//     float radius;
+// };
+// struct SetRadiusOutputStruct
+// {
+//     float k;
+//     float l;
+// };
+
+// RWStructuredBuffer<SetRadiusInputStruct> SetRadiusInput;
+// RWStructuredBuffer<SetRadiusOutputStruct> SetRadiusOutput;
+
+// [numthreads(8,8,1)]
+// void SetRadius (uint3 id : SV_DispatchThreadID)
+// {
+//     // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+//     // float pi = SetRadiusInput[id.xy].pi;
+//     // float radius = SetRadiusInput[id.xy].radius;
+//     // float h3 = radius * radius * radius;
+
+//     // SetRadiusOutput[id.xy].k = 8.0f / (pi * h3);
+//     // SetRadiusOutput[id.xy].l = 48.0f / (pi * h3);
+
+//     float pi = SetRadiusInput[id.xy].pi;
+//     float radius = SetRadiusInput[id.xy].radius;
+//     float h3 = radius * radius * radius;
+
+//     SetRadiusOutput[id.xy].k = 8.0f / (pi * h3);
+//     SetRadiusOutput[id.xy].l = 48.0f / (pi * h3);
+// }
+
+// #pragma kernel W
+
+// struct WInputStruct
+// {
+//     float rl;
+//     float radius;
+//     float k;
+// };
+// struct WOutputStruct
+// {
+//     float res;
+// };
+
+// RWStructuredBuffer<WInputStruct> WInput;
+// RWStructuredBuffer<WOutputStruct> WOutput;
+
+// [numthreads(8,8,1)]
+// void W (uint3 id : SV_DispatchThreadID)
+// {
+//     // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+//     float rl = WInput[id.xy].rl;
+//     float radius = WInput[id.xy].radius;
+//     float k = WInput[id.xy].k;
+
+//     float q = rl / radius;
+
+//     if (q <= 0.5f)
+//     {
+//         float q2 = q * q;
+//         float q3 = q2 * q;
+//         WOutput[id.xy] = k * (6.0f * q3 - 6.0f * q2 + 1.0f);
+//     }
+//     else
+//     {
+//         WOutput[id.xy] = k * (2.0f * Mathf.Pow(1.0f - q, 3));
+//     }
+// }
+
+// #pragma kernel GradW
+
+// struct GradWInputStruct
+// {
+//     float3 r;
+//     float radius;
+//     float l;
+// };
+// struct GradWOutputStruct
+// {
+//     float3 res;
+// };
+
+// RWStructuredBuffer<GradWInputStruct> GradWInput;
+// RWStructuredBuffer<GradWOutputStruct> GradWOutput;
+
+// [numthreads(8,8,1)]
+// void GradW (uint3 id : SV_DispatchThreadID)
+// {
+//     // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    
+// }
