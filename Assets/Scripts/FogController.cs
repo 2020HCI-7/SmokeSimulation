@@ -285,17 +285,20 @@ public class FogController : MonoBehaviour
         float h = Time.fixedDeltaTime;
         FogParticleData pd = model.particles;
 
-        ClearAccelerations();
-
+       // ClearAccelerations();
+        for (int i = 0; i < 10; i++)
+        {
+            GenerateParticle();
+        }
         // for (int i = 0; i < Random.Range(0, 20); i++)
-        if (restTime > 0.0f)
+        /*if (restTime > 0.0f)
         {
             for (int i = 0; i < 30; i++)
             {
                 GenerateParticle();
             }
             restTime -= h;
-        }
+        }*/
 
         for (int i = 0; i < pd.Size(); i++) 
         {
@@ -345,46 +348,54 @@ public class FogController : MonoBehaviour
                 VelocityUpdateSecondOrder(i, h, pd.getMass(i), pd.GetPosition(i), pd.GetOldPosition(i), pd.GetLastPosition(i));
             }
         }
-        for(int i=0;i<pd.Size();++i)
+        if(barriers!=null)
         {
-            Vector3 pos = pd.GetPosition(i);
-            Vector3 vol = pd.GetVelocity(i);
-            foreach(var item in barriers)
+            for (int i = 0; i < pd.Size(); ++i)
             {
-                Debug.Log(item.Value.geometryData.geometryType);
-                BarrierData barrierData = item.Value;
-                Vector3 yuanxin = ((SphereGeometryData)barrierData.geometryData).position * 4;
-                float r = ((SphereGeometryData)barrierData.geometryData).r * 4;
-                if (Vector3.Distance(pos, yuanxin) < r)
+                Vector3 pos = pd.GetPosition(i);
+                Vector3 vol = pd.GetVelocity(i);
+                foreach (var item in barriers)
                 {
-                    Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
+                    Debug.Log(item.Value.geometryData.geometryType);
+                    BarrierData barrierData = item.Value;
+                    Vector3 yuanxin = ((SphereGeometryData)barrierData.geometryData).position * 4;
+                    float r = ((SphereGeometryData)barrierData.geometryData).r * 4;
+                    if (Vector3.Distance(pos, yuanxin) < r)
+                    {
+                        Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
+                        Vector3 finalvol = (2 * vert + vol) * 0.8f;
+                        pd.SetVelocity(i, finalvol);
+
+                    }
+                }
+
+                /*Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
+                if (Vector3.Distance(pos, yx) < 0.8f)
+                {
+                    Vector3 vert = Vector3.Dot((pos - yx).normalized, -1 * pos) * (pos - yx).normalized;
                     Vector3 finalvol = (2 * vert + vol) * 0.8f;
                     pd.SetVelocity(i, finalvol);
 
-                }
+                }*/
+
             }
-            
-            /*Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
-            if (Vector3.Distance(pos, yx) < 0.8f)
-            {
-                Vector3 vert = Vector3.Dot((pos - yx).normalized, -1 * pos) * (pos - yx).normalized;
-                Vector3 finalvol = (2 * vert + vol) * 0.8f;
-                pd.SetVelocity(i, finalvol);
-
-            }*/
-
         }
+        
         //add wind force
-        for(int i=0;i<pd.Size();i++)
+        if(windarray!=null)
         {
-            /*Vector3 pos=pd.GetPosition(i);
-            Vector3 windforce=windarray[
-                (int)((pos.x-center.x+maxSize.x/2)/maxSize.x*windsize),
-                (int)((pos.y-center.y+maxSize.y/2)/maxSize.y*windsize),
-                (int)((pos.z-center.z+maxSize.z/2)/maxSize.z*windsize)];
-            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));*/
-            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.0f,0.0f));
+            for (int i = 0; i < pd.Size(); i++)
+            {
+                Vector3 pos = pd.GetPosition(i);
+                Vector3 windforce = windarray[
+                    (int)((pos.x - center.x + maxSize.x / 2) / maxSize.x * windsize),
+                    (int)((pos.y - center.y + maxSize.y / 2) / maxSize.y * windsize),
+                    (int)((pos.z - center.z + maxSize.z / 2) / maxSize.z * windsize)];
+                pd.SetVelocity(i, pd.GetVelocity(i) + h * new Vector3(windforce.x, windforce.y, windforce.z));
+                /*pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.0f,0.0f));*/
+            }
         }
+        
         // ComputeXSPHViscosity();
         
         model.m_neighborhoodSearch.update();
