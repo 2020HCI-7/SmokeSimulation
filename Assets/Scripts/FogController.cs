@@ -28,7 +28,8 @@ public class FogController : MonoBehaviour
     private int generateIndex = 0;
 
     public int[][][] density;
-
+    public int windsize=0;
+    Vector4[,,] windarray;
     public ComputeShader PBFDensityCS;
     public ComputeShader PBFLagrangeMultiplierCS;
     public ComputeShader SolveDensityConstraintCS;
@@ -45,6 +46,19 @@ public class FogController : MonoBehaviour
     void Start()
     {
         gs = (int)(maxSize.x / unitSize);
+        windsize=10;
+        windarray=new Vector4[windsize,windsize,windsize];
+        for(int i=0;i<windsize;++i)
+        {
+            for(int j=0;j<windsize;++j)
+            {
+                
+                for(int k=0;k<windsize;++k)
+                {
+                    windarray[i,j,k]=new Vector4(0.0f,0.1f,0.0f,0.0f);
+                }
+            }
+        }
         InitFogParticles();
         InitBoundary();
     }
@@ -88,7 +102,7 @@ public class FogController : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        for (int i = 0; i < particleGameobjects.Count; i++)
+        /*for (int i = 0; i < particleGameobjects.Count; i++)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(particleGameobjects[i].transform.position, particleRadius);
@@ -99,7 +113,7 @@ public class FogController : MonoBehaviour
             // Gizmos.DrawCube(new Vector3(0, -containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
             // Gizmos.DrawCube(new Vector3(0, 0, containerDepth/2), new Vector3(containerHeight, containerHeight, border));
             // Gizmos.DrawCube(new Vector3(0, 0, -containerDepth/2), new Vector3(containerHeight, containerHeight, border));
-        }
+        }*/
     }
 
 #region 初始化
@@ -279,11 +293,19 @@ public class FogController : MonoBehaviour
             }
         }
 
+        //add wind force
+        for(int i=0;i<pd.Size();i++)
+        {
+            Vector3 pos=pd.GetPosition(i);
+            Vector4 windforce=windarray[(int)((pos.x+maxSize.x/2)/maxSize.x*windsize),(int)((pos.y+maxSize.y/2)/maxSize.y*windsize),(int)((pos.z+maxSize.z/2)/maxSize.z*windsize)];
+            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));
+            //pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.1f,0.0f));
+        }
         // ComputeXSPHViscosity();
-
+        
         model.m_neighborhoodSearch.update();
     }
-
+    
     void GenerateParticle()
     {
         // float diam = 2.0f * particleRadius;
