@@ -33,7 +33,9 @@ public class FogController : MonoBehaviour
     public ComputeShader PBFDensityCS;
     public ComputeShader PBFLagrangeMultiplierCS;
     public ComputeShader SolveDensityConstraintCS;
-    public int gs;
+    public int gsx;
+    public int gsy;
+    public int gsz;
     public float rate = 10.0f;
     public Texture3D volume;
     void Awake() {
@@ -45,7 +47,9 @@ public class FogController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gs = (int)(maxSize.x / unitSize);
+        gsx = (int)(maxSize.x / unitSize);
+        gsy = (int)(maxSize.y / unitSize);
+        gsz = (int)(maxSize.z / unitSize);
         windsize=10;
         windarray=new Vector3[windsize,windsize,windsize];
         for(int i=0;i<windsize;++i)
@@ -71,28 +75,28 @@ public class FogController : MonoBehaviour
     }
     void UpdateMat()
     {
-        var colors = new Color[gs * gs * gs];
+        var colors = new Color[gsx * gsy * gsz];
         
-        for (int i = 0; i < gs; ++i)
+        for (int i = 0; i < gsx; ++i)
         {
-            for (int j = 0; j < gs; ++j)
+            for (int j = 0; j < gsy; ++j)
             {
-                for (int k = 0; k < gs; ++k)
+                for (int k = 0; k < gsz; ++k)
                 {
                     if (density[i][j][k] > rate * 0.3f)
                     {
-                        colors[i + j * gs + k * gs * gs] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
                     }
                     else
                     {
-                        colors[i + j * gs + k * gs * gs] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
                     }
 
                 }
             }
         }
 
-        volume = new Texture3D(gs, gs, gs, TextureFormat.RGBA32, false);
+        volume = new Texture3D(gsx, gsy, gsz, TextureFormat.RGBA32, false);
         volume.SetPixels(colors, 0);
 
         volume.Apply();
