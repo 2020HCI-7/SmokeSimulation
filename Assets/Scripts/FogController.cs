@@ -30,7 +30,9 @@ public class FogController : MonoBehaviour
     public int[][][] density;
 
     public ComputeShader PBFDensityCS;
-
+    public int gs;
+    public float rate = 10.0f;
+    public Texture3D volume;
     void Awake() {
         if (instance != null)
             Destroy(instance);
@@ -40,6 +42,7 @@ public class FogController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gs = (int)(maxSize.x / unitSize);
         InitFogParticles();
         InitBoundary();
     }
@@ -48,8 +51,39 @@ public class FogController : MonoBehaviour
     void Update()
     {
         Step();
+        UpdateMat();
     }
+    void UpdateMat()
+    {
+        var colors = new Color[gs * gs * gs];
+        
+        for (int i = 0; i < gs; ++i)
+        {
+            for (int j = 0; j < gs; ++j)
+            {
+                for (int k = 0; k < gs; ++k)
+                {
+                    if (density[i][j][k] > rate * 0.3f)
+                    {
+                        colors[i + j * gs + k * gs * gs] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+                    }
+                    else
+                    {
+                        colors[i + j * gs + k * gs * gs] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
+                    }
 
+                }
+            }
+        }
+
+        volume = new Texture3D(gs, gs, gs, TextureFormat.RGBA32, false);
+        volume.SetPixels(colors, 0);
+
+        volume.Apply();
+        
+        Renderer renderer = this.GetComponent<Renderer>();
+        renderer.material.SetTexture("_Volume", volume);
+    }
     private void OnDrawGizmos()
     {
         for (int i = 0; i < particleGameobjects.Count; i++)
