@@ -65,7 +65,7 @@ public class FogController : MonoBehaviour
 
     private bool isInit = false;
 
-    public void Init(SmokeData data,Dictionary<int,BarrierData> mybarries)
+    public void Init(SmokeData data, Dictionary<int, BarrierData> _barriers, Vector3[,,] _windarray)
     {
         // gs = (int)(maxSize.x / unitSize);
         gsx = (int)(maxSize.x / unitSize);
@@ -80,11 +80,12 @@ public class FogController : MonoBehaviour
                 
                 for(int k=0;k<windsize;++k)
                 {
-                    windarray[i,j,k]=new Vector3(0.0f,0.1f,0.0f);
+                    windarray[i,j,k]=new Vector3(0.0f,5f,0.0f);
                 }
             }
         }
-        
+        barriers = _barriers;
+        windarray = _windarray;
         InitFogParticles();
         InitBoundary();
         
@@ -98,7 +99,7 @@ public class FogController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (isInit)
         {
@@ -130,13 +131,12 @@ public class FogController : MonoBehaviour
                 {
                     if (density[i][j][k] > rate * 0.3f)
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, 0.3f);
                     }
                     else
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, density[i][j][k] / rate);
                     }
-
                 }
             }
         }
@@ -1093,10 +1093,20 @@ public class FogController : MonoBehaviour
     //     //float viscosity = model.
 
     // }
-    public int GetSmokeDensity(Vector3 position)
+    public int getSmokeDensity(Vector3 position)
     {
         Vector3 delta = position - center + maxSize / 2.0f;
         return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+    }
+
+    public void setWindArray(Vector3[,,] _windArray)
+    {
+        windarray = _windArray;
+    }
+
+    public void setBarrierData(Dictionary<int, BarrierData> barrierData)
+    {
+
     }
 
 #endregion

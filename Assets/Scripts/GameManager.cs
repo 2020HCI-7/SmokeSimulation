@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         GroundData groundData = new GroundData(0, "Ground", Data.type.GROUND, false, 4.0f);
         data.Add(groundData.index, groundData);
         groundObject.GetComponent<GroundController>().setObject(groundData);
-        LightData lightData = new LightData(1, "Light", Data.type.LIGHT, false, new Color(255,255,255), 1.0f);
+        LightData lightData = new LightData(1, "Light", Data.type.LIGHT, false, new Color(1,1,1), 0f);
         data.Add(lightData.index, lightData);
         LogSmokeDensityData logSmokeDensityData = new LogSmokeDensityData(2, "SmokeDensity", Data.type.LOGDENSITY, false, false, 1.0f);
         data.Add(logSmokeDensityData.index, logSmokeDensityData);
@@ -87,14 +87,17 @@ public class GameManager : MonoBehaviour
         if(_gameMode == GameMode.OBSERVE) {
             objectAddPanel.SetActive(false);
             ObjectConfigurationPanel.SetActive(false);
+            // Time.timeScale = 1;
         }
         else {
             objectAddPanel.SetActive(true);
             ObjectConfigurationPanel.SetActive(true);
+            // Time.timeScale = 0;
         }
 
         //log
         addLog("[mode] change mode to " + gameMode.ToString());
+        
     }
     
     public void setData(Data objectData)
@@ -232,8 +235,8 @@ public class GameManager : MonoBehaviour
                 number = number + 1;
                 CubeGeometryData cubeGeometryData = new CubeGeometryData(
                     new Vector3(0f, 0.5f, 0f),
-                    new Vector3(0.2f, 0.2f, 0.2f),
-                    new Vector3(0f, 0f, 0f)
+                    new Vector3(1f, 1f, 1f),
+                    new Vector3(0f, 5f, 0f)
                 );
                 // Debug.Log(number);
                 objectData = new WindData(number, "Wind" + number.ToString(), Data.type.WIND, true, cubeGeometryData, 1f, 0f);
@@ -241,10 +244,11 @@ public class GameManager : MonoBehaviour
             }
             case Data.type.SMOKE: {
                 number = number + 1;
-                CycleGeometryData cycleGeometryData = new CycleGeometryData(
+                ConeGeometryData coneGeometryData = new ConeGeometryData(
                     new Vector3(0f, 0.5f, 0f),
-                    0.1f,
-                    new Vector3(0f, 0f, 0f)
+                    0.2f,
+                    0.5f,
+                    new Vector3(1f, 0f, 0f)
                 );
                 PhysicalData physicalData = new PhysicalData(
                     0.01f,
@@ -252,7 +256,7 @@ public class GameManager : MonoBehaviour
                     1000,
                     3f
                 );
-                objectData = new SmokeData(number, "Smoke" + number.ToString(), Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
+                objectData = new SmokeData(number, "Smoke" + number.ToString(), Data.type.SMOKE, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
                 break;
             }
             default : {

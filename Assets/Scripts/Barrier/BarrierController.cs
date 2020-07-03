@@ -7,6 +7,7 @@ public class BarrierController : MonoBehaviour
     public GameObject cubeObject;
     public GameObject cylinderObject;
     public GameObject sphereObject;
+    public GameObject smokeObject;
 
     public Dictionary<int, GameObject> barrierObjects;
     private bool[ , , ] barrierArray;
@@ -209,17 +210,17 @@ public class BarrierController : MonoBehaviour
 
     private void addUpdateArray()
     {
-
+        smokeObject.GetComponent<SmokeController>().setBarrierData(barrierObjectsData);
     }
 
     private void setUpdateArray()
     {
-
+        smokeObject.GetComponent<SmokeController>().setBarrierData(barrierObjectsData);
     }
 
     private void deleteUpdateArray()
     {
-
+        smokeObject.GetComponent<SmokeController>().setBarrierData(barrierObjectsData);
     }
 
     public Dictionary<int, BarrierData> getBarrierData()
