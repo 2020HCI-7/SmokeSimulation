@@ -64,6 +64,7 @@ public class FogController : MonoBehaviour
     }
 
     private bool isInit = false;
+    private float restTime;
 
     public void Init(SmokeData data, Dictionary<int, BarrierData> _barriers, Vector3[,,] _windarray)
     {
@@ -92,10 +93,10 @@ public class FogController : MonoBehaviour
         this.data = data;
         this.center = data.geometryData.position;
         
+        restTime = data.physicalData.duration;
+
+        
         isInit = true;
-        
-        
-        
     }
 
     // Update is called once per frame
@@ -287,9 +288,13 @@ public class FogController : MonoBehaviour
         ClearAccelerations();
 
         // for (int i = 0; i < Random.Range(0, 20); i++)
-        for (int i = 0; i < 30; i++)
+        if (restTime > 0.0f)
         {
-            GenerateParticle();
+            for (int i = 0; i < 30; i++)
+            {
+                GenerateParticle();
+            }
+            restTime -= h;
         }
 
         for (int i = 0; i < pd.Size(); i++) 
@@ -389,103 +394,103 @@ public class FogController : MonoBehaviour
     {
         Vector3 position;
         Vector3 velocity;
-        // switch (data.geometryData.geometryType)
-        // {
-        //     case GeometryData.GeometryType.CONE :
-        //     {
-        //         Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
-        //         float r = ((ConeGeometryData)data.geometryData).r;
-        //         float height = ((ConeGeometryData)data.geometryData).height;
+        switch (data.geometryData.geometryType)
+        {
+            case GeometryData.GeometryType.CONE :
+            {
+                Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
+                float r = ((ConeGeometryData)data.geometryData).r;
+                float height = ((ConeGeometryData)data.geometryData).height;
                 
-        //         float randomX;
-        //         float randomY;
-        //         float randomZ;
-        //         if (direction.z != 0.0f)
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = -(direction.x * randomX + direction.y * randomY) / direction.z;
-        //         }
-        //         else if (direction.y != 0.0f)
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = -(direction.x * randomX) / direction.y;
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
-        //         else if (direction.x != 0.0f)
-        //         {
-        //             randomX = 0.0f;
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
-        //         else
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
+                float randomX;
+                float randomY;
+                float randomZ;
+                if (direction.z != 0.0f)
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = -(direction.x * randomX + direction.y * randomY) / direction.z;
+                }
+                else if (direction.y != 0.0f)
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = -(direction.x * randomX) / direction.y;
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
+                else if (direction.x != 0.0f)
+                {
+                    randomX = 0.0f;
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
+                else
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
 
-        //         position = center;
-        //         velocity = 
-        //             (direction * height + (new Vector3(randomX, randomY, randomZ)).normalized * Random.Range(0, r)).normalized
-        //             * data.physicalData.speed;
-        //         break;
-        //     }
-        //     case GeometryData.GeometryType.CYCLE :
-        //     {
-        //         Vector3 direction = ((CycleGeometryData)data.geometryData).direction;
-        //         float r = ((CycleGeometryData)data.geometryData).r;
+                position = center;
+                velocity = 
+                    (direction * height + (new Vector3(randomX, randomY, randomZ)).normalized * Random.Range(0, r)).normalized
+                    * data.physicalData.speed;
+                break;
+            }
+            case GeometryData.GeometryType.CYCLE :
+            {
+                Vector3 direction = ((CycleGeometryData)data.geometryData).direction;
+                float r = ((CycleGeometryData)data.geometryData).r;
 
-        //         float randomX;
-        //         float randomY;
-        //         float randomZ;
-        //         if (direction.z != 0.0f)
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = -(direction.x * randomX + direction.y * randomY) / direction.z;
-        //         }
-        //         else if (direction.y != 0.0f)
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = -(direction.x * randomX) / direction.y;
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
-        //         else if (direction.x != 0.0f)
-        //         {
-        //             randomX = 0.0f;
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
-        //         else
-        //         {
-        //             randomX = Random.Range(-1.0f, 1.0f);
-        //             randomY = Random.Range(-1.0f, 1.0f);
-        //             randomZ = Random.Range(-1.0f, 1.0f);
-        //         }
+                float randomX;
+                float randomY;
+                float randomZ;
+                if (direction.z != 0.0f)
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = -(direction.x * randomX + direction.y * randomY) / direction.z;
+                }
+                else if (direction.y != 0.0f)
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = -(direction.x * randomX) / direction.y;
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
+                else if (direction.x != 0.0f)
+                {
+                    randomX = 0.0f;
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
+                else
+                {
+                    randomX = Random.Range(-1.0f, 1.0f);
+                    randomY = Random.Range(-1.0f, 1.0f);
+                    randomZ = Random.Range(-1.0f, 1.0f);
+                }
                 
-        //         position = center + (new Vector3(randomX, randomY, randomZ)).normalized * Random.Range(0, r);
-        //         velocity = direction * data.physicalData.speed;
-        //         break;
-        //     }
-        //     default :
-        //     {
-        //         position = center;
-        //         velocity = 
-        //             (new Vector3(
-        //                 Random.Range(0.0f, 1.0f),
-        //                 Random.Range(-1.0f, 1.0f), 
-        //                 Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
-        //         break;
-        //     }
-        // }
+                position = center + (new Vector3(randomX, randomY, randomZ)).normalized * Random.Range(0, r);
+                velocity = direction * data.physicalData.speed;
+                break;
+            }
+            default :
+            {
+                position = center;
+                velocity = 
+                    (new Vector3(
+                        Random.Range(0.0f, 1.0f),
+                        Random.Range(-1.0f, 1.0f), 
+                        Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+                break;
+            }
+        }
         
-        position = center;
-        velocity = 
-            (new Vector3(
-                Random.Range(0.0f, 1.0f),
-                Random.Range(-1.0f, 1.0f), 
-                Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+        // position = center;
+        // velocity = 
+        //     (new Vector3(
+        //         Random.Range(0.0f, 1.0f),
+        //         Random.Range(-1.0f, 1.0f), 
+        //         Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
 
         model.AddParticle(position, velocity);
         
