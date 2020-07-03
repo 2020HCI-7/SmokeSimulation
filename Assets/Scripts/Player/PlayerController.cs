@@ -25,7 +25,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Move();
-        Debug.Log(getFocus());
     }
 
     void Move()
@@ -78,9 +77,13 @@ public class PlayerController : MonoBehaviour
     public Vector3 getFocus()
     {
         Vector3 position = transform.position;
-        float forward = 0.5f;
+        float forward = 1f;
         float height = forward * Mathf.Sin(rotation.x * Mathf.Deg2Rad);
         float vertical = forward * Mathf.Cos(rotation.x * Mathf.Deg2Rad);
-        return new Vector3(position.x + vertical * Mathf.Sin(rotation.y * Mathf.Deg2Rad), position.y - height, position.z + vertical * Mathf.Cos(rotation.y * Mathf.Deg2Rad));
+        Vector3 returnPosition = new Vector3(position.x + vertical * Mathf.Sin(rotation.y * Mathf.Deg2Rad), position.y - height, position.z + vertical * Mathf.Cos(rotation.y * Mathf.Deg2Rad));
+        if (returnPosition.y < 0) {
+            returnPosition = new Vector3(returnPosition.x, 0f, returnPosition.z);
+        }
+        return returnPosition;
     }
 }

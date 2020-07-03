@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LogSmokeDensityController : MonoBehaviour
 {
+    public GameObject player;
     private float deltaTime;
     LogSmokeDensityData oldData;
     float time;
@@ -14,7 +15,7 @@ public class LogSmokeDensityController : MonoBehaviour
     }
 
     private void Update() {
-        // tryLog();
+        tryLog();
     }
 
     public void setObject(LogSmokeDensityData data)
@@ -28,10 +29,10 @@ public class LogSmokeDensityController : MonoBehaviour
             time += deltaTime;
             if (time > oldData.interval) {
                 time = 0f;
-                GameManager.instance.addLog("[Density] *** particles in a 0.001(0.1 * 0.1 * 0.1) space");
+                Vector3 position = player.GetComponent<PlayerController>().getFocus();
+                int number = gameObject.GetComponent<SmokeController>().getSmokeDensity(position);
+                GameManager.instance.addLog("[Density] There are "+ number.ToString() +" particles in a 0.001(0.1 * 0.1 * 0.1) space");
             }
         }
-        
-
     }
 }

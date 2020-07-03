@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class FogController : MonoBehaviour
@@ -21,10 +20,10 @@ public class FogController : MonoBehaviour
     // 烟雾源实例
     public FogModel model;
     public int m_velocityUpdateMethod = 0;
-    // private List<GameObject> particleGameobjects = new List<GameObject>();
+    private List<GameObject> particleGameobjects = new List<GameObject>();
     private Transform particleParent;
     private int generateIndex = 0;
-
+    private Dictionary<int, BarrierData> barriers;
     public int[][][] density;
     public int windsize=0;
     Vector3[,,] windarray;
@@ -59,10 +58,14 @@ public class FogController : MonoBehaviour
         // InitFogParticles();
         // InitBoundary();
     }
+    void setbarriers(BarrierData tmp)
+    {
+        barriers.Add(barriers.Count + 1, tmp);
+    }
 
     private bool isInit = false;
 
-    public void Init(SmokeData data)
+    public void Init(SmokeData data, Dictionary<int, BarrierData> _barriers, Vector3[,,] _windarray)
     {
         // gs = (int)(maxSize.x / unitSize);
         gsx = (int)(maxSize.x / unitSize);
@@ -77,19 +80,26 @@ public class FogController : MonoBehaviour
                 
                 for(int k=0;k<windsize;++k)
                 {
-                    windarray[i,j,k]=new Vector3(0.0f,0.1f,0.0f);
+                    windarray[i,j,k]=new Vector3(0.0f,5f,0.0f);
                 }
             }
         }
+        barriers = _barriers;
+        windarray = _windarray;
         InitFogParticles();
         InitBoundary();
+        
         this.data = data;
         this.center = data.geometryData.position;
+        
         isInit = true;
+        
+        
+        
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (isInit)
         {
@@ -121,13 +131,12 @@ public class FogController : MonoBehaviour
                 {
                     if (density[i][j][k] > rate * 0.3f)
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, 0.3f);
                     }
                     else
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, density[i][j][k] / rate);
                     }
-
                 }
             }
         }
@@ -142,18 +151,18 @@ public class FogController : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        // for (int i = 0; i < particleGameobjects.Count; i++)
-        // {
-        //     Gizmos.color = Color.yellow;
-        //     Gizmos.DrawSphere(particleGameobjects[i].transform.position, particleRadius);
-        //     // float border = 0.1f;
-        //     // Gizmos.DrawCube(new Vector3(containerWidth/2, 0, 0), new Vector3(border, containerHeight, containerDepth));
-        //     // Gizmos.DrawCube(new Vector3(-containerWidth/2, 0, 0), new Vector3(border, containerHeight, containerDepth));
-        //     // Gizmos.DrawCube(new Vector3(0, containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
-        //     // Gizmos.DrawCube(new Vector3(0, -containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
-        //     // Gizmos.DrawCube(new Vector3(0, 0, containerDepth/2), new Vector3(containerHeight, containerHeight, border));
-        //     // Gizmos.DrawCube(new Vector3(0, 0, -containerDepth/2), new Vector3(containerHeight, containerHeight, border));
-        // }
+        for (int i = 0; i < particleGameobjects.Count; i++)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(particleGameobjects[i].transform.position, particleRadius);
+            // float border = 0.1f;
+            // Gizmos.DrawCube(new Vector3(containerWidth/2, 0, 0), new Vector3(border, containerHeight, containerDepth));
+            // Gizmos.DrawCube(new Vector3(-containerWidth/2, 0, 0), new Vector3(border, containerHeight, containerDepth));
+            // Gizmos.DrawCube(new Vector3(0, containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
+            // Gizmos.DrawCube(new Vector3(0, -containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
+            // Gizmos.DrawCube(new Vector3(0, 0, containerDepth/2), new Vector3(containerHeight, containerHeight, border));
+            // Gizmos.DrawCube(new Vector3(0, 0, -containerDepth/2), new Vector3(containerHeight, containerHeight, border));
+        }
     }
 
 #region 初始化
@@ -292,7 +301,7 @@ public class FogController : MonoBehaviour
             pd.SetVelocity(i, velocity);
             Vector3 position = pd.GetPosition(i) + h * pd.GetVelocity(i);
             pd.SetPosition(i, position);
-            // particleGameobjects[i].transform.position = position;
+            particleGameobjects[i].transform.position = position;
             
             Vector3 delta = position - center;
             if (delta.x > maxSize.x/2 || delta.x < -maxSize.x/2 || 
@@ -300,8 +309,8 @@ public class FogController : MonoBehaviour
                 delta.z > maxSize.z/2 || delta.z < -maxSize.z/2)
             {
                 model.DeleteParticle(i);
-                // Destroy(particleGameobjects[i]);
-                // particleGameobjects.RemoveAt(i);
+                Destroy(particleGameobjects[i]);
+                particleGameobjects.RemoveAt(i);
                 i = i - 1;
             }
         }
@@ -331,17 +340,44 @@ public class FogController : MonoBehaviour
                 VelocityUpdateSecondOrder(i, h, pd.getMass(i), pd.GetPosition(i), pd.GetOldPosition(i), pd.GetLastPosition(i));
             }
         }
+        for(int i=0;i<pd.Size();++i)
+        {
+            Vector3 pos = pd.GetPosition(i);
+            Vector3 vol = pd.GetVelocity(i);
+            
+            for (int j=0;j<barriers.Count;++j)
+            {
+                SphereBarrierData barrierData =(SphereBarrierData) barriers[j];
+                Vector3 yuanxin=((SphereGeometryData)barrierData.geometryData).position*4;
+                float r = ((SphereGeometryData)barrierData.geometryData).r*4;
+                if (Vector3.Distance(pos, yuanxin) < r)
+                {
+                    Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
+                    Vector3 finalvol = (2 * vert + vol) * 0.8f;
+                    pd.SetVelocity(i, finalvol);
 
+                }
+            }
+            Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
+            if (Vector3.Distance(pos, yx) < 0.8f)
+            {
+                Vector3 vert = Vector3.Dot((pos - yx).normalized, -1 * pos) * (pos - yx).normalized;
+                Vector3 finalvol = (2 * vert + vol) * 0.8f;
+                pd.SetVelocity(i, finalvol);
+
+            }
+
+        }
         //add wind force
         for(int i=0;i<pd.Size();i++)
         {
-            Vector3 pos=pd.GetPosition(i);
+            /*Vector3 pos=pd.GetPosition(i);
             Vector3 windforce=windarray[
                 (int)((pos.x-center.x+maxSize.x/2)/maxSize.x*windsize),
                 (int)((pos.y-center.y+maxSize.y/2)/maxSize.y*windsize),
                 (int)((pos.z-center.z+maxSize.z/2)/maxSize.z*windsize)];
-            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));
-            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.1f,0.0f));
+            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));*/
+            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.0f,0.0f));
         }
         // ComputeXSPHViscosity();
         
@@ -449,18 +485,15 @@ public class FogController : MonoBehaviour
         //         Random.Range(0.0f, 1.0f),
         //         Random.Range(-1.0f, 1.0f), 
         //         Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
-        // Debug.Log(position);
-        // Debug.Log(position);
-        // Debug.Log(velocity);
 
         model.AddParticle(position, velocity);
         
-        // GameObject particle = new GameObject();
-        // particle.name = "particle" + generateIndex.ToString();
-        // particle.transform.position = position;
-        // particle.transform.SetParent(particleParent);
-        // particleGameobjects.Add(particle);
-        // generateIndex++;
+        GameObject particle = new GameObject();
+        particle.name = "particle" + generateIndex.ToString();
+        particle.transform.position = position;
+        particle.transform.SetParent(particleParent);
+        particleGameobjects.Add(particle);
+        generateIndex++;
     }
 
     void UpdateDensity()
@@ -1060,6 +1093,21 @@ public class FogController : MonoBehaviour
     //     //float viscosity = model.
 
     // }
+    public int getSmokeDensity(Vector3 position)
+    {
+        Vector3 delta = position - center + maxSize / 2.0f;
+        return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+    }
+
+    public void setWindArray(Vector3[,,] _windArray)
+    {
+        windarray = _windArray;
+    }
+
+    public void setBarrierData(Dictionary<int, BarrierData> barrierData)
+    {
+
+    }
 
 #endregion
 
