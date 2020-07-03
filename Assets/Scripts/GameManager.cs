@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -275,11 +277,344 @@ public class GameManager : MonoBehaviour
     //file
     public void save(string path)
     {
+        FileStream fs = new FileStream(path, FileMode.Create);
+        StreamWriter sw = new StreamWriter(fs);
+        string line = "";
 
+        //write configuration
+        line = "configuration" + "-" + "number=" + number.ToString();
+        sw.Write(line);
+        sw.Write("\n");
+
+        //write data
+        foreach (var item in data)
+        {
+            line = "data" + "-";
+            line = line + "index=" + item.Key + "-";
+            line = line + "name=" + item.Value.name + "-";
+            line = line + "type=" + item.Value.dataTypeToString(item.Value.dataType) + "-";
+            line = line + "deletable=" + item.Value.deletable.ToString() + "-";
+            switch(item.Value.dataType) {
+                case Data.type.GROUND: {
+                    GroundData groundData = ((GroundData)item.Value);
+                    line = line + "size=" + groundData.size;
+                    break;
+                }
+                case Data.type.LIGHT: {
+                    LightData lightData = ((LightData)item.Value);
+                    line = line + "intensity=" + lightData.intensity.ToString() + "-";
+                    line = line + "color:R=" + lightData.color.r.ToString() + ":G=" + lightData.color.g.ToString() + ":B=" + lightData.color.b.ToString();
+                    break;
+                }
+                case Data.type.LOGDENSITY: {
+                    LogSmokeDensityData logSmokeDensityData = ((LogSmokeDensityData)item.Value);
+                    line = line + "logFlag=" + logSmokeDensityData.logFlag.ToString() + "-";
+                    line = line + "interval=" + logSmokeDensityData.interval.ToString();
+                    break;
+                }
+                case Data.type.BARRIER: {
+                    BarrierData barrierData = ((BarrierData)item.Value);
+                    line = line + "geometryType=" + barrierData.geometryData.getGeometryTypeStringArray()[(int)barrierData.geometryData.geometryType] + "-";
+                    line = line + "position=" + barrierData.geometryData.position.ToString() + "-";
+                    switch(barrierData.geometryData.geometryType) {
+                        case GeometryData.GeometryType.CUBE: {
+                            line = line + "size=" + ((CubeGeometryData)barrierData.geometryData).size.ToString() + "-";
+                            line = line + "direction=" + ((CubeGeometryData)barrierData.geometryData).direction.ToString();
+                            break;
+                        }
+                        case GeometryData.GeometryType.SPHERE: {
+                            line = line + "r=" + ((SphereGeometryData)barrierData.geometryData).r.ToString();
+                            break;
+                        }
+                        case GeometryData.GeometryType.CYLINDER: {
+                            line = line + "r=" + ((CylinderGeometryData)barrierData.geometryData).r.ToString() + "-";
+                            line = line + "height=" + ((CylinderGeometryData)barrierData.geometryData).height.ToString() + "-";
+                            line = line + "direction=" + ((CylinderGeometryData)barrierData.geometryData).direction.ToString();
+                            break;
+                        }
+                    }
+                    break;
+                }case Data.type.WIND: {
+                    WindData windData = ((WindData)item.Value);
+                    line = line + "intensity=" + windData.intensity.ToString() + "-";
+                    line = line + "interference=" + windData.interference.ToString() + "-";
+                    line = line + "geometryType=" + windData.geometryData.getGeometryTypeStringArray()[(int)windData.geometryData.geometryType] + "-";
+                    line = line + "position=" + windData.geometryData.position.ToString() + "-";
+                    switch (windData.geometryData.geometryType)
+                    {
+                        case GeometryData.GeometryType.CUBE: {
+                            line = line + "size=" + ((CubeGeometryData)windData.geometryData).size.ToString();
+                            break;
+                        }
+                        case GeometryData.GeometryType.SPHERE: {
+                            line = line + "r=" + ((SphereGeometryData)windData.geometryData).r.ToString();
+                            break;
+                        }
+                        case GeometryData.GeometryType.CYLINDER: {
+                            line = line + "r=" + ((CylinderGeometryData)windData.geometryData).r.ToString() + "-";
+                            line = line + "height=" + ((CylinderGeometryData)windData.geometryData).height.ToString();
+                            break;
+                        }
+                    }
+                    break;
+                }case Data.type.SMOKE: {
+                    SmokeData smokeData = ((SmokeData)item.Value);
+                    switch(smokeData.smokeType) {
+                        case SmokeData.SmokeType.SMOKE: {
+                            line = line + "smokeType=smoke-";
+                            line = line + "duration=" + smokeData.physicalData.duration.ToString() + "-";
+                            line = line + "maxNumber=" + smokeData.physicalData.maxNumber.ToString() + "-";
+                            line = line + "particleSize=" + smokeData.physicalData.particleSize.ToString() + "-";
+                            line = line + "speed=" + smokeData.physicalData.speed.ToString() + "-";
+                            line = line + "color:R=" + smokeData.color.r.ToString() + ":G=" + smokeData.color.g.ToString() + ":B=" + smokeData.color.b.ToString() + "-";
+                            line = line + "geometryType=" + smokeData.geometryData.getGeometryTypeStringArray()[(int)smokeData.geometryData.geometryType] + "-";
+                            line = line + "position=" + smokeData.geometryData.position.ToString() + "-";
+                            switch (smokeData.geometryData.geometryType)
+                            {
+                                case GeometryData.GeometryType.CYCLE: {
+                                    line = line + "r=" + ((CycleGeometryData)smokeData.geometryData).r.ToString() + "-";
+                                    line = line + "direction=" + ((CycleGeometryData)smokeData.geometryData).direction.ToString();
+                                    break;
+                                }
+                                case GeometryData.GeometryType.CONE: {
+                                    line = line + "r=" + ((ConeGeometryData)smokeData.geometryData).r.ToString() + "-";
+                                    line = line + "height=" + ((ConeGeometryData)smokeData.geometryData).height.ToString() + "-";
+                                    line = line + "direction=" + ((ConeGeometryData)smokeData.geometryData).direction.ToString();
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case SmokeData.SmokeType.FIRE: {
+                            line = line + "smokeType=fire-";
+                            break;
+                        }
+                        case SmokeData.SmokeType.EXPLOSION: {
+                            line = line + "smokeType=explosion-";
+                            break;
+                        }
+                    }
+                    break;
+                }
+                default : {
+                    break;
+                }
+            }
+            sw.Write(line);
+            sw.Write("\n");
+        }
+        
+        sw.Flush();
+        
+        sw.Close();
+        fs.Close();
     }
 
     public void load(string path)
     {
+        //删除现有的object
+        List<int> deleteIndex = new List<int>();
+        foreach (var item in data) {
+            if(item.Key > 2) {
+                deleteIndex.Add(item.Key);
+            }
+        }
+        foreach(var item in deleteIndex) {
+            destroyObject(item);
+        }
+        
 
+        StreamReader sr = new StreamReader(path, Encoding.Default);
+        string line;
+        string[] lineParts;
+        //configuration
+        line = sr.ReadLine();
+        lineParts = line.Split('-');
+        number = int.Parse(lineParts[1].Substring(lineParts[1].IndexOf('=') + 1));
+
+        //ground
+        line = sr.ReadLine();
+        lineParts = line.Split('-');
+        ((GroundData)data[0]).size = float.Parse(lineParts[5].Substring(lineParts[5].IndexOf('=') + 1));
+        setData(data[0]);
+
+        //light
+        line = sr.ReadLine();
+        lineParts = line.Split('-');
+        ((LightData)data[1]).intensity = float.Parse(lineParts[5].Substring(lineParts[5].IndexOf('=') + 1));
+        string[] RGB = lineParts[6].Split(':');
+        int r = int.Parse(RGB[1].Substring(RGB[1].IndexOf('=') + 1));
+        int g = int.Parse(RGB[2].Substring(RGB[2].IndexOf('=') + 1));
+        int b = int.Parse(RGB[3].Substring(RGB[3].IndexOf('=') + 1));
+        ((LightData)data[1]).color = new Color(r, g, b);
+        setData(data[1]);
+
+        //logDensity
+        line = sr.ReadLine();
+        lineParts = line.Split('-');
+        ((LogSmokeDensityData)data[2]).logFlag = bool.Parse(lineParts[5].Substring(lineParts[5].IndexOf('=') + 1));
+        ((LogSmokeDensityData)data[2]).interval = float.Parse(lineParts[6].Substring(lineParts[6].IndexOf('=') + 1));
+        setData(data[2]);
+
+        //data
+        while ((line = sr.ReadLine()) != null)
+        {
+            lineParts = line.Split('-');
+            Data newData = new Data(0, "", 0, false);
+            newData.index = int.Parse(lineParts[1].Substring(lineParts[1].IndexOf('=') + 1));
+            newData.name = lineParts[2].Substring(lineParts[2].IndexOf('=') + 1);
+            newData.deletable = bool.Parse(lineParts[4].Substring(lineParts[4].IndexOf('=') + 1));
+            switch(lineParts[3].Substring(lineParts[3].IndexOf('=') + 1)) {
+                case "BARRIER": {
+                    newData.dataType = Data.type.BARRIER;
+                    BarrierData barrierData = null;
+                    Vector3 position = vector3Parse(lineParts[6].Substring(lineParts[6].IndexOf('=') + 1));
+                    string typeString = lineParts[5].Substring(lineParts[5].IndexOf('=') + 1);
+                    switch(typeString) {
+                        case "cube": {
+                            Vector3 size = vector3Parse(lineParts[7].Substring(lineParts[7].IndexOf('=') + 1));
+                            Vector3 direction = vector3Parse(lineParts[8].Substring(lineParts[8].IndexOf('=') + 1));
+                            CubeGeometryData cubeGeometryData = new CubeGeometryData(position, size, direction);
+                            barrierData = new BarrierData(newData.index, newData.name, newData.dataType, newData.deletable, cubeGeometryData);
+                            addObject(barrierData);
+                            break;
+                        }
+                        case "sphere": {
+                            float radius = float.Parse((lineParts[7].Substring(lineParts[7].IndexOf('=') + 1)));
+                            SphereGeometryData sphereGeometryData = new SphereGeometryData(position, radius);
+                            barrierData = new BarrierData(newData.index, newData.name, newData.dataType, newData.deletable, sphereGeometryData);
+                            addObject(barrierData);
+                            break;
+                        }
+                        case "cylinder": {
+                            float radius = float.Parse((lineParts[7].Substring(lineParts[7].IndexOf('=') + 1)));
+                            float height = float.Parse((lineParts[8].Substring(lineParts[8].IndexOf('=') + 1)));
+                            Vector3 direction = vector3Parse(lineParts[9].Substring(lineParts[9].IndexOf('=') + 1));
+                            CylinderGeometryData cylinderGeometryData = new CylinderGeometryData(position, radius, height, direction);
+                            barrierData = new BarrierData(newData.index, newData.name, newData.dataType, newData.deletable, cylinderGeometryData);
+                            addObject(barrierData);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case "WIND": {
+                    newData.dataType = Data.type.WIND;
+                    WindData windData = null;
+                    float intensity = float.Parse(lineParts[5].Substring(lineParts[5].IndexOf('=') + 1));
+                    float interfence = float.Parse(lineParts[6].Substring(lineParts[6].IndexOf('=') + 1));
+                    Vector3 position = vector3Parse(lineParts[8].Substring(lineParts[8].IndexOf('=') + 1));
+                    string typeString = lineParts[7].Substring(lineParts[7].IndexOf('=') + 1);
+                    switch(typeString) {
+                        case "cube": {
+                            Vector3 size = vector3Parse(lineParts[9].Substring(lineParts[9].IndexOf('=') + 1));
+                            Vector3 direction = new Vector3(0f,0f,0f);
+                            CubeGeometryData cubeGeometryData = new CubeGeometryData(position, size, direction);
+                            windData = new WindData(newData.index, newData.name, newData.dataType, newData.deletable, cubeGeometryData, intensity, interfence);
+                            addObject(windData);
+                            break;
+                        }
+                        case "sphere": {
+                            float radius = float.Parse((lineParts[9].Substring(lineParts[9].IndexOf('=') + 1)));
+                            SphereGeometryData sphereGeometryData = new SphereGeometryData(position, radius);
+                            windData = new WindData(newData.index, newData.name, newData.dataType, newData.deletable, sphereGeometryData, intensity, interfence);
+                            addObject(windData);
+                            break;
+                        }
+                        case "cylinder": {
+                            float radius = float.Parse((lineParts[9].Substring(lineParts[9].IndexOf('=') + 1)));
+                            float height = float.Parse((lineParts[10].Substring(lineParts[10].IndexOf('=') + 1)));
+                            Vector3 direction = Vector3.zero;
+                            CylinderGeometryData cylinderGeometryData = new CylinderGeometryData(position, radius, height, direction);
+                            windData = new WindData(newData.index, newData.name, newData.dataType, newData.deletable, cylinderGeometryData, intensity, interfence);
+                            addObject(windData);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case "SMOKE": {
+                    newData.dataType = Data.type.SMOKE;
+                    SmokeData smokeData = null;
+                    string smokeTypeString = lineParts[5].Substring(lineParts[5].IndexOf('=') + 1);
+                    switch(smokeTypeString) {
+                        case "smoke": {
+                            float duration = float.Parse(lineParts[6].Substring(lineParts[6].IndexOf('=') + 1));
+                            int maxNumber = int.Parse(lineParts[7].Substring(lineParts[7].IndexOf('=') + 1));
+                            float particleSize = float.Parse(lineParts[8].Substring(lineParts[8].IndexOf('=') + 1));
+                            float speed = float.Parse(lineParts[9].Substring(lineParts[9].IndexOf('=') + 1));
+                            RGB = lineParts[10].Split(':');
+                            int r_value = int.Parse(RGB[1].Substring(RGB[1].IndexOf('=') + 1));
+                            int g_value = int.Parse(RGB[2].Substring(RGB[2].IndexOf('=') + 1));
+                            int b_value = int.Parse(RGB[3].Substring(RGB[3].IndexOf('=') + 1));
+                            Color color = new Color(r_value, g_value, b_value);
+                            Vector3 position = vector3Parse(lineParts[12].Substring(lineParts[12].IndexOf('=') + 1));
+                            string typeString = lineParts[11].Substring(lineParts[11].IndexOf('=') + 1);
+                            switch(typeString) {
+                                case "cycle": {
+                                    float radius = float.Parse((lineParts[13].Substring(lineParts[13].IndexOf('=') + 1)));
+                                    Vector3 direction = vector3Parse(lineParts[14].Substring(lineParts[14].IndexOf('=') + 1));
+                                    CycleGeometryData cycleGeometryData = new CycleGeometryData(position, radius, direction);
+                                    smokeData = new SmokeData(newData.index, newData.name, newData.dataType, newData.deletable, cycleGeometryData, new PhysicalData(particleSize, duration, maxNumber, speed),SmokeData.SmokeType.SMOKE, color);
+                                    addObject(smokeData);
+                                    break;
+                                }
+                                case "cylinder": {
+                                    float radius = float.Parse((lineParts[13].Substring(lineParts[13].IndexOf('=') + 1)));
+                                    float height = float.Parse((lineParts[14].Substring(lineParts[14].IndexOf('=') + 1)));
+                                    Vector3 direction = vector3Parse((lineParts[15].Substring(lineParts[15].IndexOf('=') + 1)));
+                                    CylinderGeometryData cylinderGeometryData = new CylinderGeometryData(position, radius, height, direction);
+                                    smokeData = new SmokeData(newData.index, newData.name, newData.dataType, newData.deletable, cylinderGeometryData, new PhysicalData(particleSize, duration, maxNumber, speed), SmokeData.SmokeType.SMOKE, color);
+                                    addObject(smokeData);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case "fire": {
+                            CycleGeometryData cycleGeometryData = new CycleGeometryData(
+                                new Vector3(0f, 0.5f, 0f),
+                                0.1f,
+                                new Vector3(0f, 0f, 0f)
+                            );
+                            PhysicalData physicalData = new PhysicalData(
+                                0.01f,
+                                10.0f,
+                                1000,
+                                3f
+                            );
+                            smokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.FIRE, new Color(0, 0, 0));
+                            addObject(smokeData);
+                            break;
+                        }
+                        case "explosion": {
+                            CycleGeometryData cycleGeometryData = new CycleGeometryData(
+                                new Vector3(0f, 0.5f, 0f),
+                                0.1f,
+                                new Vector3(0f, 0f, 0f)
+                            );
+                            PhysicalData physicalData = new PhysicalData(
+                                0.01f,
+                                10.0f,
+                                1000,
+                                3f
+                            );
+                            smokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.FIRE, new Color(0, 0, 0));
+                            addObject(smokeData);
+                            break;
+                        }
+                    }
+                    break;
+                }
+    
+            }
+        }
+    }
+
+    private Vector3 vector3Parse(string vector3String)
+    {
+        vector3String = vector3String.Substring(1, vector3String.Length - 2);
+        string[] vector3Values = vector3String.Split(',');
+        return new Vector3(float.Parse(vector3Values[0]), float.Parse(vector3Values[1]), float.Parse(vector3Values[2]));
     }
 }

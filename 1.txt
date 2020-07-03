@@ -1,0 +1,5 @@
+configuration-number=3
+data-index=0-name=Ground-type=GROUND-deletable=False-size=4
+data-index=1-name=Light-type=LIGHT-deletable=False-intensity=1-color:R=255:G=255:B=255
+data-index=2-name=SmokeDensity-type=LOGDENSITY-deletable=False-logFlag=False-interval=1
+data-index=3-name=Smoke3-type=SMOKE-deletable=True-smokeType=smoke-duration=10-maxNumber=1000-particleSize=0.01-speed=3-color:R=0:G=0:B=0-geometryType=cone-position=(0.0, 0.5, 0.0)-r=0.1-height=0.1-direction=(0.0, 0.0, 0.0)

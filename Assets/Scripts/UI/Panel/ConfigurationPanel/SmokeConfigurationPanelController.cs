@@ -23,7 +23,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
         smokeTypeSetLine = transform.GetChild(0).gameObject;
         bool[] value0 = { false, false , false };
         value0[(int)_smokeData.smokeType] = true;
-        smokeTypeSetLine.GetComponent<ThreeTypeChooseLineController>().init("smoke type", _smokeData.geometryData.getGeometryTypeStringArray(), value0);
+        smokeTypeSetLine.GetComponent<ThreeTypeChooseLineController>().init("smoke type", _smokeData.getSmokeTypeStringArray(), value0);
 
         if(_smokeData.smokeType != SmokeData.SmokeType.SMOKE) {
             geometrySetLine.SetActive(false);
@@ -137,7 +137,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                                     1000,
                                     3f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0 ,0 ,0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0 ,0 ,0));
                                 init(newSmokeData);
                             }
                             else if (value == "fire")
@@ -153,7 +153,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                                     1000,
                                     3f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.FIRE, new Color(0, 0, 0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.FIRE, new Color(0, 0, 0));
                                 init(newSmokeData);
                             }
                             else if (value == "explosion")
@@ -169,7 +169,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                                     1000,
                                     3f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.EXPLOSION, new Color(0, 0, 0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.EXPLOSION, new Color(0, 0, 0));
                                 init(newSmokeData);
                             }
                             break;
@@ -191,7 +191,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                                     1000,
                                     3f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
                                 init(newSmokeData);
                             }
                             else if (value == "cycle")
@@ -207,7 +207,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                                     1000,
                                     3f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.BARRIER, true, cycleGeometryData, physicalData, SmokeData.SmokeType.FIRE, new Color(0, 0, 0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
                                 init(newSmokeData);
                             }
                             break;

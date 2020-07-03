@@ -39,7 +39,7 @@ public class GroundController : MonoBehaviour
             //
             for (float i = lastSize; i < nowSize; i+=0.2f) {
                 float temp = i / 2 + 0.05f;
-                for (float k = 0; k < 2 * temp; k+=0.1f) {
+                for (float k = 0; k < 2 * temp - 0.01f; k+=0.1f) {
                     position = new Vector3(temp, 0, (-1) * temp + k);
                     unit = Instantiate(planeUnit, position, Quaternion.identity);
                     unit.transform.SetParent(transform);
@@ -54,14 +54,14 @@ public class GroundController : MonoBehaviour
                     unit.transform.SetParent(transform);
                 }
             }
+            // Debug.Log(transform.childCount);
             lastSize = nowSize;
             oldData.size = nowSize;
         }
         else if(nowSize < lastSize) {
-            int index = (int)(nowSize / 0.1f * nowSize / 0.1f);
-            Debug.Log(index);
+            int index = (int)((nowSize + 0.01f) / 0.1f) * (int)((nowSize + 0.01f) / 0.1f);
             //逆序遍历
-            for (int i = transform.childCount - 1; i > index; i--)
+            for (int i = transform.childCount - 1; i >= index; i--)
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
