@@ -68,7 +68,7 @@ public class FogController : MonoBehaviour
         gsx = (int)(maxSize.x / unitSize);
         gsy = (int)(maxSize.y / unitSize);
         gsz = (int)(maxSize.z / unitSize);
-        windsize=10;
+        windsize=40;
         windarray=new Vector3[windsize,windsize,windsize];
         for(int i=0;i<windsize;++i)
         {
