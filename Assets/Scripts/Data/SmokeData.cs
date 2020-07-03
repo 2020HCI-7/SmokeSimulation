@@ -5,21 +5,22 @@ using UnityEngine;
 public class SmokeData : Data
 {
     public enum SmokeType { SMOKE, FIRE, EXPLOSION };
+    public SmokeType smokeType;
     public GeometryData geometryData;
     public PhysicalData physicalData;
-    public SmokeType smokeType;
     public Color color;
-    public bool windDirtyFlag;
-    public bool barrierDirtyFLag;
 
-    public SmokeData(int _index, string _name, type _type, bool _deletable, GeometryData _geometryData, PhysicalData _physicalData,  SmokeType _smokeType, Color _color, bool _windDirtyFlag, bool _barrierDirtyFLag): base(_index, _name, _type, _deletable)
+    public SmokeData(int _index, string _name, type _type, bool _deletable, GeometryData _geometryData, PhysicalData _physicalData,  SmokeType _smokeType, Color _color): base(_index, _name, _type, _deletable)
     {
         geometryData = _geometryData;
         physicalData = _physicalData;
         smokeType = _smokeType;
         color = _color;
-        windDirtyFlag = _windDirtyFlag;
-        barrierDirtyFLag = _barrierDirtyFLag;
+    }
+    public string[] getSmokeTypeStringArray()
+    {
+        string[] array = { "smoke", "fire", "explostion"};
+        return array;
     }
 }
 

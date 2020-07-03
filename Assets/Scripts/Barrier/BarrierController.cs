@@ -109,20 +109,19 @@ public class BarrierController : MonoBehaviour
         
         switch(data.geometryData.geometryType) {
             case GeometryData.GeometryType.CUBE:
-                quaternion = Quaternion.AngleAxis(0f, ((CubeGeometryData)data.geometryData).direction);
+                quaternion = Quaternion.Euler(((CubeGeometryData)data.geometryData).direction);
                 newObject = Instantiate(cubeObject, position, quaternion, transform);
                 newObject.transform.localScale = ((CubeGeometryData)data.geometryData).size;
                 break;
             case GeometryData.GeometryType.SPHERE:               
-                quaternion = Quaternion.AngleAxis(0f, ((CubeGeometryData)data.geometryData).direction);
-                newObject = Instantiate(cylinderObject, position, quaternion, transform);
+                newObject = Instantiate(sphereObject, position, quaternion, transform);
                 float r = ((SphereGeometryData)data.geometryData).r;
-                newObject.transform.localScale = new Vector3(r, r, r);
+                newObject.transform.localScale = new Vector3(r * 2, r * 2, r * 2);
                 break;
             case GeometryData.GeometryType.CYLINDER: 
-                quaternion = Quaternion.AngleAxis(0f, ((CylinderGeometryData)data.geometryData).direction);
-                newObject = Instantiate(cubeObject, position, quaternion, transform);
-                newObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r, ((CylinderGeometryData)data.geometryData).height,((CylinderGeometryData)data.geometryData).r);
+                quaternion = Quaternion.Euler(((CylinderGeometryData)data.geometryData).direction);
+                newObject = Instantiate(cylinderObject, position, quaternion, transform);
+                newObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r * 2, ((CylinderGeometryData)data.geometryData).height,((CylinderGeometryData)data.geometryData).r);
                 break;
             default:
                 break;
@@ -135,7 +134,7 @@ public class BarrierController : MonoBehaviour
 
     public void setObject(BarrierData data)
     {
-
+        
         BarrierData oldData = barrierObjectsData[data.index];
         GameObject barrierObject = barrierObjects[data.index];
         if(oldData.geometryData.geometryType == data.geometryData.geometryType) {
@@ -143,18 +142,18 @@ public class BarrierController : MonoBehaviour
             {
                 case GeometryData.GeometryType.CUBE:
                     barrierObject.transform.position = ((CubeGeometryData)data.geometryData).position;
-                    barrierObject.transform.localEulerAngles = Quaternion.AngleAxis(0f, ((CubeGeometryData)data.geometryData).direction).eulerAngles;
-                    barrierObject.transform.localScale = transform.localScale = ((CubeGeometryData)data.geometryData).size;
+                    barrierObject.transform.localEulerAngles = ((CubeGeometryData)data.geometryData).direction;
+                    barrierObject.transform.localScale = ((CubeGeometryData)data.geometryData).size;
                     break;
                 case GeometryData.GeometryType.SPHERE:
                     barrierObject.transform.position = ((SphereGeometryData)data.geometryData).position;
                     float r = ((SphereGeometryData)data.geometryData).r;
-                    barrierObject.transform.localScale = new Vector3(r, r, r);
+                    barrierObject.transform.localScale = new Vector3(r * 2, r * 2, r * 2);
                     break;
                 case GeometryData.GeometryType.CYLINDER:
                     barrierObject.transform.position = ((CylinderGeometryData)data.geometryData).position;
-                    barrierObject.transform.localEulerAngles = Quaternion.AngleAxis(0f, ((CylinderGeometryData)data.geometryData).direction).eulerAngles;
-                    barrierObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r, ((CylinderGeometryData)data.geometryData).height, ((CylinderGeometryData)data.geometryData).r);
+                    barrierObject.transform.localEulerAngles = ((CylinderGeometryData)data.geometryData).direction;
+                    barrierObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r * 2, ((CylinderGeometryData)data.geometryData).height, ((CylinderGeometryData)data.geometryData).r);
                     break;
                 default:
                     break;
@@ -172,20 +171,19 @@ public class BarrierController : MonoBehaviour
             switch (data.geometryData.geometryType)
             {
                 case GeometryData.GeometryType.CUBE:
-                    quaternion = Quaternion.AngleAxis(0f, ((CubeGeometryData)data.geometryData).direction);
+                    quaternion = Quaternion.Euler(((CubeGeometryData)data.geometryData).direction);
                     newObject = Instantiate(cubeObject, position, quaternion, transform);
                     newObject.transform.localScale = ((CubeGeometryData)data.geometryData).size;
                     break;
                 case GeometryData.GeometryType.SPHERE:
-                    quaternion = Quaternion.AngleAxis(0f, ((CubeGeometryData)data.geometryData).direction);
                     newObject = Instantiate(cylinderObject, position, quaternion, transform);
                     float r = ((SphereGeometryData)data.geometryData).r;
-                    newObject.transform.localScale = new Vector3(r, r, r);
+                    newObject.transform.localScale = new Vector3(r * 2, r * 2, r * 2);
                     break;
                 case GeometryData.GeometryType.CYLINDER:
-                    quaternion = Quaternion.AngleAxis(0f, ((CylinderGeometryData)data.geometryData).direction);
+                    quaternion = Quaternion.Euler(((CylinderGeometryData)data.geometryData).direction);
                     newObject = Instantiate(cubeObject, position, quaternion, transform);
-                    newObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r, ((CylinderGeometryData)data.geometryData).height, ((CylinderGeometryData)data.geometryData).r);
+                    newObject.transform.localScale = new Vector3(((CylinderGeometryData)data.geometryData).r * 2, ((CylinderGeometryData)data.geometryData).height, ((CylinderGeometryData)data.geometryData).r);
                     break;
                 default:
                     break;

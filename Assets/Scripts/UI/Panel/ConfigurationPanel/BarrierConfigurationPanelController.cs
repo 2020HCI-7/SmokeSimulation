@@ -40,24 +40,24 @@ public class BarrierConfigurationPanelController : ObjectConfiguration
 
         switch(_barrierData.geometryData.geometryType) {
             case GeometryData.GeometryType.SPHERE:
+                directionSetLine.SetActive(false);
                 sphereSetLine.SetActive(true);
                 sphereSetLine.GetComponent<OneValueSetLineController>().init("s_r", ((SphereGeometryData)_barrierData.geometryData).r.ToString());
-                directionSetLine.SetActive(false);
                 break;
             case GeometryData.GeometryType.CYLINDER:
-                cylinderSetLine.SetActive(true);
-                string[] key3 = { "c_r", "c_h" };
-                string[] value3 = { ((CylinderGeometryData)_barrierData.geometryData).r.ToString(), ((CylinderGeometryData)_barrierData.geometryData).height.ToString() };
-                cylinderSetLine.GetComponent<TwoValueSetLineController>().init(key3, value3);
-
+                directionSetLine.SetActive(true);
                 key5[0] = "cy_x";
                 key5[1] = "cy_y";
                 key5[2] = "cy_z";
-                directionSetLine.SetActive(true);
                 value5[0] = ((CylinderGeometryData)_barrierData.geometryData).direction.x.ToString();
                 value5[1] = ((CylinderGeometryData)_barrierData.geometryData).direction.y.ToString();
                 value5[2] = ((CylinderGeometryData)_barrierData.geometryData).direction.z.ToString();
                 directionSetLine.GetComponent<ThreeValueSetLineController>().init(key5, value5);
+
+                cylinderSetLine.SetActive(true);
+                string[] key3 = { "c_r", "c_h" };
+                string[] value3 = { ((CylinderGeometryData)_barrierData.geometryData).r.ToString(), ((CylinderGeometryData)_barrierData.geometryData).height.ToString() };
+                cylinderSetLine.GetComponent<TwoValueSetLineController>().init(key3, value3);
                 break;
             case GeometryData.GeometryType.CUBE:
                 cubeSetLine.SetActive(true);
@@ -83,6 +83,8 @@ public class BarrierConfigurationPanelController : ObjectConfiguration
 
     public override void set(string key, string value)
     {
+        // Debug.Log(key);
+        // Debug.Log(value);
         try
         {
             if (value != "")
@@ -92,15 +94,33 @@ public class BarrierConfigurationPanelController : ObjectConfiguration
                     case "geometry":
                         {
                             if(value == "cube") {
-                                barrierData.geometryData.geometryType = GeometryData.GeometryType.CUBE;
+                                CubeGeometryData cubeGeometryData = new CubeGeometryData(
+                                    new Vector3(0f, 0.5f, 0f),
+                                    new Vector3(0.2f, 0.2f, 0.2f),
+                                    new Vector3(0f, 0f, 0f)
+                                );
+                                BarrierData newBarrierData = new BarrierData(barrierData.index, barrierData.name, Data.type.BARRIER, true, cubeGeometryData);
+                                init(newBarrierData);
                             }
                             else if(value == "sphere") {
-                                barrierData.geometryData.geometryType = GeometryData.GeometryType.SPHERE;
+                                SphereGeometryData sphereGeometryData = new SphereGeometryData(
+                                    new Vector3(0f, 0.5f, 0f),
+                                    0.2f
+                                );
+                                BarrierData newBarrierData = new BarrierData(barrierData.index, barrierData.name, Data.type.BARRIER, true, sphereGeometryData);
+                                init(newBarrierData);
                             }
                             else if(value == "cylinder") {
-                                barrierData.geometryData.geometryType = GeometryData.GeometryType.CYLINDER;
+                                CylinderGeometryData cylinderGeometryData = new CylinderGeometryData(
+                                    new Vector3(0f, 3f, 0f),
+                                    0.2f,
+                                    0.4f,
+                                    new Vector3(0f, 0f, 0f)
+                                );
+                                BarrierData newBarrierData = new BarrierData(barrierData.index, barrierData.name, Data.type.BARRIER, true, cylinderGeometryData);
+                                init(newBarrierData);
                             }
-                            init(barrierData);
+                            
                             break;
                         }
                     //key1 { "p_x", "p_y", "p_z" }
@@ -203,6 +223,7 @@ public class BarrierConfigurationPanelController : ObjectConfiguration
 
     public BarrierData getData()
     {
+        // Debug.Log(barrierData.geometryData.geometryType);
         return barrierData;
     }
 }

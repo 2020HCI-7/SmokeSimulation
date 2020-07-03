@@ -10,6 +10,7 @@ public class ObjectConfigurationPanelController : MonoBehaviour
     public GameObject lightConfigurationPanel;
     public GameObject LogSmokeDensityConfigurationPanel;
     public GameObject BarrierConfigurationPanel;
+    public GameObject WindConfigurationPanel;
     private ConfigurationMode configurationMode;
     private Data.type dataType;
     private string addButtonText = "ADD";
@@ -27,6 +28,7 @@ public class ObjectConfigurationPanelController : MonoBehaviour
         lightConfigurationPanel.SetActive(false);
         LogSmokeDensityConfigurationPanel.SetActive(false);
         BarrierConfigurationPanel.SetActive(false);
+        WindConfigurationPanel.SetActive(false);
 
         dataType = data.dataType;
         switch (dataType)
@@ -49,6 +51,12 @@ public class ObjectConfigurationPanelController : MonoBehaviour
             case Data.type.BARRIER: {
                 BarrierConfigurationPanel.SetActive(true);
                 BarrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().init((BarrierData)data);
+                break;
+            }
+            case Data.type.WIND: {
+                Debug.Log("WIND");
+                WindConfigurationPanel.SetActive(true);
+                WindConfigurationPanel.GetComponent<WindConfigurationPanelController>().init((WindData)data);
                 break;
             }
             default: {
@@ -92,6 +100,10 @@ public class ObjectConfigurationPanelController : MonoBehaviour
                 data = BarrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().getData();
                 break;
             }
+            case Data.type.WIND: {
+                data = WindConfigurationPanel.GetComponent<WindConfigurationPanelController>().getData();
+                break;
+            }
             default : {
                 break;
             }
@@ -103,6 +115,11 @@ public class ObjectConfigurationPanelController : MonoBehaviour
             }
             else if(configurationMode == ConfigurationMode.ADD) {
                 GameManager.instance.addObject(data);
+                groundConfigurationPanel.SetActive(false);
+                lightConfigurationPanel.SetActive(false);
+                LogSmokeDensityConfigurationPanel.SetActive(false);
+                BarrierConfigurationPanel.SetActive(false);
+                WindConfigurationPanel.SetActive(false);
             }
         }
     }

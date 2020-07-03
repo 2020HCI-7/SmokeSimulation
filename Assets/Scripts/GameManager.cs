@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     public GameObject lightObject;
     public GameObject smokeObject;
     public GameObject barrierObject;
+    public GameObject windObject;
 
     //lifetime
     void Awake()
@@ -120,6 +121,12 @@ public class GameManager : MonoBehaviour
             case Data.type.BARRIER: {
                 barrierObject.GetComponent<BarrierController>().setObject((BarrierData)objectData);
                 break;
+            }case Data.type.WIND: {
+                windObject.GetComponent<WindController>().setObject((WindData)objectData);
+                break;
+            }case Data.type.SMOKE: {
+                smokeObject.GetComponent<SmokeController>().setObject((SmokeData)objectData);
+                break;
             }
             default : {
                 break;
@@ -140,6 +147,14 @@ public class GameManager : MonoBehaviour
         switch(objectData.dataType) {
             case Data.type.BARRIER: {
                 barrierObject.GetComponent<BarrierController>().addObject((BarrierData)objectData);
+                break;
+            }
+            case Data.type.WIND: {
+                windObject.GetComponent<WindController>().addObject((WindData)objectData);
+                break;
+            }
+            case Data.type.SMOKE: {
+                smokeObject.GetComponent<SmokeController>().addObject((SmokeData)objectData);
                 break;
             }
             default : {
@@ -171,6 +186,14 @@ public class GameManager : MonoBehaviour
                 barrierObject.GetComponent<BarrierController>().deleteObject((BarrierData)objectData);
                 break;
             }
+            case Data.type.WIND: {
+                windObject.GetComponent<WindController>().deleteObject((WindData)objectData);
+                break;
+            }
+            case Data.type.SMOKE: {
+                smokeObject.GetComponent<SmokeController>().deleteObject((SmokeData)objectData);
+                break;
+            }
             default : {
                 string logString = "[Error] the " + objectData.dataTypeToString(objectData.dataType) + " object can't be deleted";
                 addLog(logString);
@@ -189,17 +212,29 @@ public class GameManager : MonoBehaviour
 
     public void toAddConfiguration(Data.type type)
     {
+        // Debug.Log(type);
         Data objectData = null;
         switch(type) {
             case Data.type.BARRIER: {
                 number = number + 1;
                 CubeGeometryData cubeGeometryData = new CubeGeometryData(
-                    new Vector3(0f, 3f, 0f),
-                    new Vector3(1f, 1f, 1f),
-                    new Vector3(0f, 1f, 0f)
+                    new Vector3(0f, 0.5f, 0f),
+                    new Vector3(0.2f, 0.2f, 0.2f),
+                    new Vector3(0f, 0f, 0f)
                 );
-                Debug.Log(number);
+                // Debug.Log(number);
                 objectData = new BarrierData(number, "Barrier" + number.ToString(), Data.type.BARRIER, true, cubeGeometryData);
+                break;
+            }
+            case Data.type.WIND: {
+                number = number + 1;
+                CubeGeometryData cubeGeometryData = new CubeGeometryData(
+                    new Vector3(0f, 0.5f, 0f),
+                    new Vector3(0.2f, 0.2f, 0.2f),
+                    new Vector3(0f, 0f, 0f)
+                );
+                // Debug.Log(number);
+                objectData = new WindData(number, "Wind" + number.ToString(), Data.type.WIND, true, cubeGeometryData, 1f, 0f);
                 break;
             }
             default : {
@@ -210,6 +245,7 @@ public class GameManager : MonoBehaviour
         }
         
         if (objectData != null) {
+            // Debug.Log(objectData.dataType);
             ObjectConfigurationPanel.GetComponent<ObjectConfigurationPanelController>().showConfigurePanel(objectData, ObjectConfigurationPanelController.ConfigurationMode.ADD);
         }
     }

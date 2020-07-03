@@ -42,7 +42,7 @@ public class CylinderGeometryData : GeometryData
     public float r;
     public Vector3 direction;
 
-    public CylinderGeometryData(int _index, string _name, Data.type _type, bool _deletable, Vector3 _position, float _height, float _r, Vector3 _direction) : base(GeometryType.CYLINDER, _position)
+    public CylinderGeometryData(Vector3 _position, float _height, float _r, Vector3 _direction) : base(GeometryType.CYLINDER, _position)
     {
         height = _height;
         r = _r;
@@ -54,7 +54,7 @@ public class SphereGeometryData : GeometryData
 {
     public float r;
 
-    public SphereGeometryData(int _index, string _name, Data.type _type, Vector3 _position, bool _deletable, float _r) : base(GeometryType.SPHERE, _position)
+    public SphereGeometryData(Vector3 _position, float _r) : base(GeometryType.SPHERE, _position)
     {
         r = _r;
     }
@@ -67,7 +67,7 @@ public class ConeGeometryData : GeometryData
     public float height;
     public Vector3 direction;
 
-    public ConeGeometryData(int _index, string _name, Data.type _type, Vector3 _position, bool _deletable, float _r, float _height, Vector3 _direction) : base(GeometryType.CONE, _position)
+    public ConeGeometryData(Vector3 _position, float _r, float _height, Vector3 _direction) : base(GeometryType.CONE, _position)
     {
         r = _r;
         height = _height;
@@ -80,7 +80,7 @@ public class CycleGeometryData : GeometryData
     public float r;
     public Vector3 direction;
 
-    public CycleGeometryData(int _index, string _name, Data.type _type, Vector3 _position, bool _deletable, float _r,Vector3 _direction) : base(GeometryType.CYCLE, _position)
+    public CycleGeometryData(Vector3 _position, float _r,Vector3 _direction) : base(GeometryType.CYCLE, _position)
     {
         r = _r;
         direction = _direction;
