@@ -23,7 +23,7 @@ public class FogController : MonoBehaviour
     private List<GameObject> particleGameobjects = new List<GameObject>();
     private Transform particleParent;
     private int generateIndex = 0;
-
+    private Dictionary<int, BarrierData> barriers;
     public int[][][] density;
     public int windsize=0;
     Vector3[,,] windarray;
@@ -58,6 +58,10 @@ public class FogController : MonoBehaviour
         // InitFogParticles();
         // InitBoundary();
     }
+    void setbarriers(BarrierData tmp)
+    {
+        barriers.Add(barriers.Count + 1, tmp);
+    }
 
     private bool isInit = false;
 
@@ -80,11 +84,17 @@ public class FogController : MonoBehaviour
                 }
             }
         }
+        barriers = new Dictionary<int, BarrierData>();
         InitFogParticles();
         InitBoundary();
+        
         this.data = data;
         this.center = data.geometryData.position;
+        
         isInit = true;
+        
+        
+        
     }
 
     // Update is called once per frame
@@ -334,14 +344,29 @@ public class FogController : MonoBehaviour
         {
             Vector3 pos = pd.GetPosition(i);
             Vector3 vol = pd.GetVelocity(i);
-            Vector3 yuanxin = new Vector3(0.5f, 0.5f, 0.5f) + center;
-            if(Vector3.Distance(pos,yuanxin)<0.8f)
+            
+            for (int j=0;j<barriers.Count;++j)
             {
-                Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
-                Vector3 finalvol = (2 * vert + vol)*0.8f;
+                SphereBarrierData barrierData =(SphereBarrierData) barriers[j];
+                Vector3 yuanxin=((SphereGeometryData)barrierData.geometryData).position*4;
+                float r = ((SphereGeometryData)barrierData.geometryData).r*4;
+                if (Vector3.Distance(pos, yuanxin) < r)
+                {
+                    Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
+                    Vector3 finalvol = (2 * vert + vol) * 0.8f;
+                    pd.SetVelocity(i, finalvol);
+
+                }
+            }
+            Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
+            if (Vector3.Distance(pos, yx) < 0.8f)
+            {
+                Vector3 vert = Vector3.Dot((pos - yx).normalized, -1 * pos) * (pos - yx).normalized;
+                Vector3 finalvol = (2 * vert + vol) * 0.8f;
                 pd.SetVelocity(i, finalvol);
 
             }
+
         }
         //add wind force
         for(int i=0;i<pd.Size();i++)
