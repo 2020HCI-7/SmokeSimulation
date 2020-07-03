@@ -65,7 +65,7 @@ public class FogController : MonoBehaviour
 
     private bool isInit = false;
 
-    public void Init(SmokeData data)
+    public void Init(SmokeData data,Dictionary<int,BarrierData> mybarries)
     {
         // gs = (int)(maxSize.x / unitSize);
         gsx = (int)(maxSize.x / unitSize);
@@ -84,13 +84,13 @@ public class FogController : MonoBehaviour
                 }
             }
         }
-        barriers = new Dictionary<int, BarrierData>();
+        
         InitFogParticles();
         InitBoundary();
         
         this.data = data;
         this.center = data.geometryData.position;
-        
+        this.barriers = mybarries;
         isInit = true;
         
         
