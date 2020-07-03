@@ -54,7 +54,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
         cycleSetLine.SetActive(false);
         coneSetLine.SetActive(false);
 
-        string[] key5 = { "d_x", "d_y", "d_z" };
+        string[] key5 = new string[3];
         string[] value5 = new string[3];
 
         switch (_smokeData.geometryData.geometryType)
@@ -65,6 +65,9 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
 
                 directionSetLine = transform.GetChild(5).gameObject;
                 directionSetLine.SetActive(true);
+                key5[0] = "cy_x";
+                key5[1] = "cy_y";
+                key5[2] = "cy_z";
                 value5[0] = ((CycleGeometryData)_smokeData.geometryData).direction.x.ToString();
                 value5[1] = ((CycleGeometryData)_smokeData.geometryData).direction.y.ToString();
                 value5[2] = ((CycleGeometryData)_smokeData.geometryData).direction.z.ToString();
@@ -77,6 +80,9 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                 coneSetLine.GetComponent<TwoValueSetLineController>().init(key4, value4);
 
                 directionSetLine = transform.GetChild(5).gameObject;
+                key5[0] = "co_x";
+                key5[1] = "co_y";
+                key5[2] = "co_z";
                 directionSetLine.SetActive(true);
                 value5[0] = ((ConeGeometryData)_smokeData.geometryData).direction.x.ToString();
                 value5[1] = ((ConeGeometryData)_smokeData.geometryData).direction.y.ToString();
@@ -240,6 +246,38 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                     case "co_h":
                         {
                             ((ConeGeometryData)smokeData.geometryData).height = float.Parse(value);
+                            break;
+                        }
+                    //key5 { "co_x", "co_y", "co_z" }
+                    case "co_x":
+                        {
+                            ((ConeGeometryData)smokeData.geometryData).direction.x = float.Parse(value);
+                            break;
+                        }
+                    case "co_y":
+                        {
+                            ((ConeGeometryData)smokeData.geometryData).direction.y = float.Parse(value);
+                            break;
+                        }
+                    case "co_z":
+                        {
+                            ((ConeGeometryData)smokeData.geometryData).direction.y = float.Parse(value);
+                            break;
+                        }
+                    //key5 { "cy_x", "cy_y", "cy_z" }
+                    case "cy_x":
+                        {
+                            ((CycleGeometryData)smokeData.geometryData).direction.x = float.Parse(value);
+                            break;
+                        }
+                    case "cy_y":
+                        {
+                            ((CycleGeometryData)smokeData.geometryData).direction.y = float.Parse(value);
+                            break;
+                        }
+                    case "cy_z":
+                        {
+                            ((CycleGeometryData)smokeData.geometryData).direction.y = float.Parse(value);
                             break;
                         }
                     //key6 = { "duration", "maxNumber" };
