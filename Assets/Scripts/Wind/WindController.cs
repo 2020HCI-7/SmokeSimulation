@@ -10,7 +10,6 @@ public class WindController : MonoBehaviour
     private Dictionary<int, WindData> windObjectsData;
     private Dictionary<int, Vector3[,,]> windArrayData;
     private Noise noise;
-    private float groundSize;
 
     // Start is called before the first frame update
     void Start()
@@ -35,67 +34,33 @@ public class WindController : MonoBehaviour
     void Update() {
     }
 
-    // public void doubleArraySize()
-    // {
-    //     size = 300;
-    //     Vector3[,,] newWindArray = new Vector3[size * 2, size * 2, size * 2];
-    //     int halfSize = size / 2;
-    //     for (int i = 0; i < size; i++)
-    //     {
-    //         for (int j = 0; j < size; j++)
-    //         {
-    //             for (int k = 0; k < size; k += 8)
-    //             {
-    //                 newWindArray[i + halfSize, j + halfSize, k + 0] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 1] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 2] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 3] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 4] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 5] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 6] = windArray[i, j, k + 0];
-    //                 newWindArray[i + halfSize, j + halfSize, k + 7] = windArray[i, j, k + 0];
-    //             }
-    //         }
-    //     }
+    public void doubleArraySize()
+    {
+        Vector3[,,] newWindArray = new Vector3[size * 2, size * 2, size * 2];
+        int halfSize = size / 2;
 
-
-    //     for (int i = 0; i < halfSize; i++)
-    //     {
-    //         for (int j = 0; j < halfSize; j++)
-    //         {
-    //             for (int k = 0; k < halfSize; k += 8)
-    //             {
-    //                 newWindArray[i, j, k + 0] = Vector3.zero;
-    //                 newWindArray[i, j, k + 1] = Vector3.zero;
-    //                 newWindArray[i, j, k + 2] = Vector3.zero;
-    //                 newWindArray[i, j, k + 3] = Vector3.zero;
-    //                 newWindArray[i, j, k + 4] = Vector3.zero;
-    //                 newWindArray[i, j, k + 5] = Vector3.zero;
-    //                 newWindArray[i, j, k + 6] = Vector3.zero;
-    //                 newWindArray[i, j, k + 7] = Vector3.zero;
-    //             }
-    //         }
-    //     }
-
-    //     size = size * 2;
-    //     for (int i = halfSize; i < size; i++)
-    //     {
-    //         for (int j = halfSize; j < size; j++)
-    //         {
-    //             for (int k = halfSize; k < size; k += 8)
-    //             {
-    //                 newWindArray[i, j, k + 0] = Vector3.zero;
-    //                 newWindArray[i, j, k + 1] = Vector3.zero;
-    //                 newWindArray[i, j, k + 2] = Vector3.zero;
-    //                 newWindArray[i, j, k + 3] = Vector3.zero;
-    //                 newWindArray[i, j, k + 4] = Vector3.zero;
-    //                 newWindArray[i, j, k + 5] = Vector3.zero;
-    //                 newWindArray[i, j, k + 6] = Vector3.zero;
-    //                 newWindArray[i, j, k + 7] = Vector3.zero;
-    //             }
-    //         }
-    //     }
-    // }
+        for (int i = halfSize; i < size * 2; i++)
+        {
+            for (int j = halfSize; j < size * 2; j++)
+            {
+                for (int k = halfSize; k < size * 2; k++)
+                {
+                    newWindArray[i, j, k] = Vector3.zero;
+                }
+            }
+        }
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                for (int k = 0; k < size; k++)
+                {
+                    newWindArray[i + halfSize, j + halfSize, k + halfSize] = windArray[i, j, k];
+                }
+            }
+        }
+        windArray = newWindArray;
+    }
 
     public void addObject(WindData data)
     {
@@ -185,9 +150,9 @@ public class WindController : MonoBehaviour
                     int sizeX = (int)(cubeGeometryData.size.x / 0.1f);
                     int sizeY = (int)(cubeGeometryData.size.y / 0.1f);
                     int sizeZ = (int)(cubeGeometryData.size.z / 0.1f);
-                    int beginX = (int)((position.x + 2f ) / 0.1f) - sizeX / 2;
-                    int beginY = (int)((position.y + 2f ) / 0.1f) - sizeY / 2;
-                    int beginZ = (int)((position.z + 2f ) / 0.1f) - sizeZ / 2;
+                    int beginX = (int)((position.x) / 0.1f) - sizeX / 2 + size / 2;
+                    int beginY = (int)((position.y) / 0.1f) - sizeY / 2 + size / 2;
+                    int beginZ = (int)((position.z) / 0.1f) - sizeZ / 2 + size / 2;
                     for (int i = 0; i < sizeX; i++)
                     {
                         for (int j = 0; j < sizeZ; j++)
