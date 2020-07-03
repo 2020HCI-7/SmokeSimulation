@@ -94,6 +94,8 @@ public class FogController : MonoBehaviour
         this.center = data.geometryData.position;
         
         restTime = data.physicalData.duration;
+
+        
         isInit = true;
     }
 
@@ -347,12 +349,12 @@ public class FogController : MonoBehaviour
         {
             Vector3 pos = pd.GetPosition(i);
             Vector3 vol = pd.GetVelocity(i);
-            
-            for (int j=0;j<barriers.Count;++j)
+            foreach(var item in barriers)
             {
-                SphereBarrierData barrierData =(SphereBarrierData) barriers[j];
-                Vector3 yuanxin=((SphereGeometryData)barrierData.geometryData).position*4;
-                float r = ((SphereGeometryData)barrierData.geometryData).r*4;
+                Debug.Log(item.Value.geometryData.geometryType);
+                BarrierData barrierData = item.Value;
+                Vector3 yuanxin = ((SphereGeometryData)barrierData.geometryData).position * 4;
+                float r = ((SphereGeometryData)barrierData.geometryData).r * 4;
                 if (Vector3.Distance(pos, yuanxin) < r)
                 {
                     Vector3 vert = Vector3.Dot((pos - yuanxin).normalized, -1 * pos) * (pos - yuanxin).normalized;
@@ -361,14 +363,15 @@ public class FogController : MonoBehaviour
 
                 }
             }
-            Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
+            
+            /*Vector3 yx = new Vector3(0.0f, 1.0f, 0.0f);
             if (Vector3.Distance(pos, yx) < 0.8f)
             {
                 Vector3 vert = Vector3.Dot((pos - yx).normalized, -1 * pos) * (pos - yx).normalized;
                 Vector3 finalvol = (2 * vert + vol) * 0.8f;
                 pd.SetVelocity(i, finalvol);
 
-            }
+            }*/
 
         }
         //add wind force
