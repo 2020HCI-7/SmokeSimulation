@@ -126,18 +126,19 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
                         {
                             if (value == "smoke")
                             {
-                                CycleGeometryData cycleGeometryData = new CycleGeometryData(
+                                ConeGeometryData coneGeometryData = new ConeGeometryData(
                                     new Vector3(0f, 0.5f, 0f),
-                                    0.1f,
-                                    new Vector3(0f, 0f, 0f)
+                                    0.2f,
+                                    0.5f,
+                                    new Vector3(1f, 0f, 0f)
                                 );
                                 PhysicalData physicalData = new PhysicalData(
                                     0.01f,
                                     10.0f,
                                     1000,
-                                    3f
+                                    1f
                                 );
-                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0 ,0 ,0));
+                                SmokeData newSmokeData = new SmokeData(smokeData.index, smokeData.name, Data.type.SMOKE, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0 ,0 ,0));
                                 init(newSmokeData);
                             }
                             else if (value == "fire")

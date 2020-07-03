@@ -77,7 +77,7 @@ public class FogController : MonoBehaviour
                 
                 for(int k=0;k<windsize;++k)
                 {
-                    windarray[i,j,k]=new Vector3(0.0f,0.1f,0.0f);
+                    windarray[i,j,k]=new Vector3(0.0f,5f,0.0f);
                 }
             }
         }
@@ -1056,10 +1056,20 @@ public class FogController : MonoBehaviour
     //     //float viscosity = model.
 
     // }
-    public int GetSmokeDensity(Vector3 position)
+    public int getSmokeDensity(Vector3 position)
     {
         Vector3 delta = position - center + maxSize / 2.0f;
         return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+    }
+
+    public void setWindArray(Vector3[,,] _windArray)
+    {
+        windarray = _windArray;
+    }
+
+    public void setBarrierData(Dictionary<int, BarrierData> barrierData)
+    {
+        
     }
 
 #endregion

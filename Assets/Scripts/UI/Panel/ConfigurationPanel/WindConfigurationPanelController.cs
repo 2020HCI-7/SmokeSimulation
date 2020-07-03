@@ -80,7 +80,7 @@ public class WindConfigurationPanelController : ObjectConfiguration
                                 CubeGeometryData cubeGeometryData = new CubeGeometryData(
                                     new Vector3(0f, 0.5f, 0f),
                                     new Vector3(1f, 1f, 1f),
-                                    new Vector3(0f, 5f, 0f)
+                                    new Vector3(0f, 0, 5f)
                                 );
                                 WindData newWindData = new WindData(windData.index, windData.name, Data.type.BARRIER, true, cubeGeometryData, 1f, 0f);
                                 init(newWindData);

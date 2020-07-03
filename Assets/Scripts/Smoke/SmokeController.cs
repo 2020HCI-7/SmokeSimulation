@@ -6,8 +6,6 @@ public class SmokeController : MonoBehaviour
 {
     public GameObject smokeSource;
 
-    public GameObject barrierObject;
-    
     private Dictionary<int, SmokeData> smokeObjectsData;
     private Dictionary<int, GameObject> smokeObjects;
 
@@ -81,13 +79,24 @@ public class SmokeController : MonoBehaviour
         int density = 0;
         foreach(var item in smokeObjects) 
         {
-            density += item.Value.GetComponent<FogController>().GetSmokeDensity(position);
+            density += item.Value.GetComponent<FogController>().getSmokeDensity(position);
         }
         return density;
     }
 
-    public Dictionary<int, BarrierData> getBarrierData()
+    public void setBarrierData(Dictionary<int, BarrierData> barrierData)
     {
-        return barrierObject.GetComponent<BarrierController>().getBarrierData();
+        foreach (var item in smokeObjects)
+        {
+            item.Value.GetComponent<FogController>().setBarrierData(barrierData);
+        }
+    }
+
+    public void setWindArray(Vector3[,,] windArray)
+    {
+        foreach (var item in smokeObjects)
+        {
+            item.Value.GetComponent<FogController>().setWindArray(windArray);
+        }
     }
 }

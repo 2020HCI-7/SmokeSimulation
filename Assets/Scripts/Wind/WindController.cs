@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WindController : MonoBehaviour
 {
-    public GameObject ground;
+    public GameObject smokeObject;
     private Vector3[,,] windArray;
     private int size;
     private Dictionary<int, WindData> windObjectsData;
@@ -127,7 +127,8 @@ public class WindController : MonoBehaviour
                 break;
             }
         }
-        
+
+        smokeObject.GetComponent<SmokeController>().setWindArray(windArray);
     }
 
     private void deleteUpdateArray()
@@ -167,6 +168,7 @@ public class WindController : MonoBehaviour
                 }
             }
         }
+        smokeObject.GetComponent<SmokeController>().setWindArray(windArray);
     }
 
     private Vector3[ , , ] getCubeWindArray(CubeGeometryData cubeGeometryData, float intensity, float interfence)
@@ -209,13 +211,5 @@ public class WindController : MonoBehaviour
     private Vector3[,,] getCylinderWindArray(CylinderGeometryData cycleGeometryData, float intensity, float interfence)
     {
         return new Vector3[1, 1, 1];
-    }
-
-    public Vector3[,,] getWindArray(){
-        return windArray;
-    }
-
-    public int getWindArraySize(){
-        return size;
     }
 }
