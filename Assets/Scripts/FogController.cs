@@ -92,9 +92,10 @@ public class FogController : MonoBehaviour
         
         this.data = data;
         this.center = data.geometryData.position;
-
-        restTime = data.physicalData.duration;
         
+        restTime = data.physicalData.duration;
+
+        this.barriers = mybarries;
         isInit = true;
     }
 
