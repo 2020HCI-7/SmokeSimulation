@@ -29,7 +29,7 @@ public class FogController : MonoBehaviour
 
     public int[][][] density;
     public int windsize=0;
-    Vector4[,,] windarray;
+    Vector3[,,] windarray;
     public ComputeShader PBFDensityCS;
     public ComputeShader PBFLagrangeMultiplierCS;
     public ComputeShader SolveDensityConstraintCS;
@@ -47,7 +47,7 @@ public class FogController : MonoBehaviour
     {
         gs = (int)(maxSize.x / unitSize);
         windsize=10;
-        windarray=new Vector4[windsize,windsize,windsize];
+        windarray=new Vector3[windsize,windsize,windsize];
         for(int i=0;i<windsize;++i)
         {
             for(int j=0;j<windsize;++j)
@@ -55,7 +55,7 @@ public class FogController : MonoBehaviour
                 
                 for(int k=0;k<windsize;++k)
                 {
-                    windarray[i,j,k]=new Vector4(0.0f,0.1f,0.0f,0.0f);
+                    windarray[i,j,k]=new Vector3(0.0f,0.1f,0.0f);
                 }
             }
         }
@@ -297,7 +297,7 @@ public class FogController : MonoBehaviour
         for(int i=0;i<pd.Size();i++)
         {
             Vector3 pos=pd.GetPosition(i);
-            Vector4 windforce=windarray[(int)((pos.x+maxSize.x/2)/maxSize.x*windsize),(int)((pos.y+maxSize.y/2)/maxSize.y*windsize),(int)((pos.z+maxSize.z/2)/maxSize.z*windsize)];
+            Vector3 windforce=windarray[(int)((pos.x+maxSize.x/2)/maxSize.x*windsize),(int)((pos.y+maxSize.y/2)/maxSize.y*windsize),(int)((pos.z+maxSize.z/2)/maxSize.z*windsize)];
             pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));
             //pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.1f,0.0f));
         }
