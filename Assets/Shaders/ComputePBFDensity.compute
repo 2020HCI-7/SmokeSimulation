@@ -1,0 +1,94 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#include "UnityCG.cginc"
+
+CBUFFER_START(Params)
+	float m_radius;
+	float m_k;
+	float m_l;
+	float m_W_zero;
+    int numberOfParticles;
+    bool boundaryHandling;
+CBUFFER_END
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWStructuredBuffer<float3> x;
+RWStructuredBuffer<float> mass;
+RWStructuredBuffer<float3> boundaryX;
+RWStructuredBuffer<float> boundaryPsi;
+RWStructuredBuffer<int> numNeighbors;
+RWStructuredBuffer<int> neighbors;
+
+RWStructuredBuffer<float> density;
+
+float W(float3 r)
+{
+    float res = 0.0;
+    float rl = length(r);
+    float q = rl/m_radius;
+
+    if (q <= 0.5)
+    {
+        float q2 = q * q;
+        float q3 = q2 * q;
+        res = m_k * (6.0 * q3 - 6.0 * q2 + 1.0);
+    }
+    else
+    {
+        res = m_k * (2.0 * pow(1.0 - q, 3));
+    }
+    return res;
+}
+
+float3 gradW(float3 r)
+{
+    float3 res;
+    float rl = length(r);
+    float q = rl/m_radius;
+
+    if (rl > 0)
+    {
+        float3 gradq = r * (1.0 / (rl*m_radius));
+        if (q <= 0.5)
+        {
+            res = m_l*q*(3.0 * q - 2.0)*gradq;
+        }
+        else
+        {
+            float factor = 1.0 - q;
+            res = m_l*(-factor*factor)*gradq;
+        }
+    }
+    return res;
+}
+
+float W_zero()
+{
+    return m_W_zero;
+}
+
+[numthreads(8,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    int particleIndex = id.x;
+    float densityF = mass[particleIndex] * W_zero();
+    for (int j = 0; j < numNeighbors[particleIndex]; j++)
+    {
+        int neighborIndex = neighbors[j];
+        if (neighborIndex < numberOfParticles)
+        {
+            densityF += mass[neighborIndex] * W(x[particleIndex] - x[neighborIndex]);
+        }
+        else if (boundaryHandling)
+        {
+            densityF += boundaryPsi[neighborIndex - numberOfParticles] * 
+                W(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+        }
+    }
+
+    // model.setDensity(particleIndex, densityF);
+    density[particleIndex] = densityF;
+    
+}

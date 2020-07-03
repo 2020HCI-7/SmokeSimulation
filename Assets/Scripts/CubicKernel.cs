@@ -12,10 +12,10 @@ public class CubicKernel : MonoBehaviour
         instance = this;
     }
 
-	protected static float m_radius;
-	protected static float m_k;
-	protected static float m_l;
-	protected static float m_W_zero;
+	public static float m_radius { get; protected set;}
+	public static float m_k { get; protected set;}
+	public static float m_l { get; protected set;}
+	public static float m_W_zero { get; protected set;}
 
     // struct SetRadiusInputStruct
     // {

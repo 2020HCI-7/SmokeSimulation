@@ -19,7 +19,7 @@ public class FogController : MonoBehaviour
     // public float containerHeight = 4.0f;
     public Vector3 center = Vector3.zero;
     public Vector3 maxSize = new Vector3(10.0f, 10.0f, 10.0f);
-    private float unitSize = 0.2f;
+    private float unitSize = 0.1f;
     // 烟雾源实例
     public FogModel model;
     public int m_velocityUpdateMethod = 0;
@@ -28,6 +28,8 @@ public class FogController : MonoBehaviour
     private int generateIndex = 0;
 
     public int[][][] density;
+
+    public ComputeShader PBFDensityCS;
 
     void Awake() {
         if (instance != null)
@@ -322,7 +324,18 @@ public class FogController : MonoBehaviour
         while (iter < maxIter)
         {
             // float avg_density_err = 0.0f;
-
+            
+            // ComputePBFDensity(
+            //     nParticles,
+            //     pd.m_x,
+            //     pd.m_masses,
+            //     model.m_boundaryX,
+            //     model.m_boundaryPsi,
+            //     numNeighbors,
+            //     neighbors,
+            //     model.m_density0,
+            //     true
+            // );
             for (int i = 0; i < nParticles; i++) 
             {
                 ComputePBFDensity(
@@ -409,6 +422,78 @@ public class FogController : MonoBehaviour
         model.setDensity(particleIndex, density);
         return true;
     }
+    // ComputeBuffer PBFDensity_XBuffer;
+    // ComputeBuffer PBFDensity_massBuffer;
+    // ComputeBuffer PBFDensity_boundaryXBuffer;
+    // ComputeBuffer PBFDensity_boundaryPsiBuffer;
+    // ComputeBuffer PBFDensity_numNeighborsBuffer;
+    // ComputeBuffer PBFDensity_neighborsBuffer;
+    // ComputeBuffer PBFDensity_densityBuffer;
+
+    // bool ComputePBFDensity(
+    //     int numberOfParticles,
+    //     List<Vector3> x,
+    //     List<float> mass,
+    //     List<Vector3> boundaryX,
+    //     List<float> boundaryPsi,
+    //     int[] numNeighbors,
+    //     int[] neighbors,
+    //     float density0,
+    //     bool boundaryHandling
+    //     )
+    // {
+    //     if (PBFDensity_XBuffer == null || PBFDensity_XBuffer.count != numberOfParticles)
+    //     {
+    //         if (PBFDensity_XBuffer != null) 
+    //             PBFDensity_XBuffer.Release();
+    //         if (PBFDensity_massBuffer != null) 
+    //             PBFDensity_massBuffer.Release();
+    //         if (PBFDensity_boundaryXBuffer != null) 
+    //             PBFDensity_boundaryXBuffer.Release();
+    //         if (PBFDensity_boundaryPsiBuffer != null) 
+    //             PBFDensity_boundaryPsiBuffer.Release();
+    //         if (PBFDensity_numNeighborsBuffer != null) 
+    //             PBFDensity_numNeighborsBuffer.Release();
+    //         if (PBFDensity_neighborsBuffer != null) 
+    //             PBFDensity_neighborsBuffer.Release();
+    //         if (PBFDensity_densityBuffer != null)
+    //             PBFDensity_densityBuffer.Release();
+    //         PBFDensity_XBuffer = new ComputeBuffer(numberOfParticles, 12);
+    //         PBFDensity_massBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         PBFDensity_boundaryXBuffer = new ComputeBuffer(numberOfParticles, 12);
+    //         PBFDensity_boundaryPsiBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         PBFDensity_numNeighborsBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         PBFDensity_neighborsBuffer = new ComputeBuffer(numberOfParticles, 240);
+    //         PBFDensity_densityBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //     }
+    //     PBFDensity_XBuffer.SetData(x);
+    //     PBFDensity_massBuffer.SetData(mass);
+    //     PBFDensity_boundaryXBuffer.SetData(boundaryX);
+    //     PBFDensity_boundaryPsiBuffer.SetData(boundaryPsi);
+    //     PBFDensity_numNeighborsBuffer.SetData(numNeighbors);
+    //     PBFDensity_neighborsBuffer.SetData(neighbors);
+
+    //     var kernel = PBFDensityCS.FindKernel("CSMain");
+    //     PBFDensityCS.SetFloat("m_radius", CubicKernel.m_radius);
+    //     PBFDensityCS.SetFloat("m_k", CubicKernel.m_k);
+    //     PBFDensityCS.SetFloat("m_l", CubicKernel.m_l);
+    //     PBFDensityCS.SetFloat("m_W_zero", CubicKernel.m_W_zero);
+    //     PBFDensityCS.SetInt("numberOfParticles", numberOfParticles);
+    //     PBFDensityCS.SetBool("boundaryHandling", true);
+
+    //     PBFDensityCS.SetBuffer(kernel, "x", PBFDensity_XBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "mass", PBFDensity_massBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "boundaryX", PBFDensity_boundaryXBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "boundaryPsi", PBFDensity_boundaryPsiBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "numNeighbors", PBFDensity_numNeighborsBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "neighbors", PBFDensity_neighborsBuffer);
+
+    //     PBFDensityCS.SetBuffer(kernel, "density", PBFDensity_densityBuffer);
+
+    //     PBFDensityCS.Dispatch(kernel, 8, 1, 1);
+
+    //     return true;
+    // }
 
     bool ComputePBFLagrangeMultiplier(
         int particleIndex,
