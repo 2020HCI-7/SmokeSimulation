@@ -1,0 +1,5 @@
+configuration-number=3
+data-index=0-name=Ground-type=GROUND-deletable=False-size=4
+data-index=1-name=Light-type=LIGHT-deletable=False-intensity=1-color:R=255:G=255:B=255
+data-index=2-name=SmokeDensity-type=LOGDENSITY-deletable=False-logFlag=False-interval=1
+data-index=3-name=Wind3-type=WIND-deletable=True-intensity=1-interference=0-geometryType=cube-position=(0.0, 0.5, 0.0)-size=(0.2, 0.2, 0.2)-direction=(0.0, 0.0, 0.0)

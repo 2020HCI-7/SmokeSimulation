@@ -343,7 +343,8 @@ public class GameManager : MonoBehaviour
                     switch (windData.geometryData.geometryType)
                     {
                         case GeometryData.GeometryType.CUBE: {
-                            line = line + "size=" + ((CubeGeometryData)windData.geometryData).size.ToString();
+                            line = line + "size=" + ((CubeGeometryData)windData.geometryData).size.ToString() + "-";
+                            line = line + "direction=" + ((CubeGeometryData)windData.geometryData).direction.ToString();
                             break;
                         }
                         case GeometryData.GeometryType.SPHERE: {
@@ -508,7 +509,7 @@ public class GameManager : MonoBehaviour
                     switch(typeString) {
                         case "cube": {
                             Vector3 size = vector3Parse(lineParts[9].Substring(lineParts[9].IndexOf('=') + 1));
-                            Vector3 direction = new Vector3(0f,0f,0f);
+                            Vector3 direction = vector3Parse(lineParts[10].Substring(lineParts[10].IndexOf('=') + 1));
                             CubeGeometryData cubeGeometryData = new CubeGeometryData(position, size, direction);
                             windData = new WindData(newData.index, newData.name, newData.dataType, newData.deletable, cubeGeometryData, intensity, interfence);
                             addObject(windData);
