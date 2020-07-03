@@ -64,6 +64,7 @@ public class FogController : MonoBehaviour
     }
 
     private bool isInit = false;
+    private float restTime;
 
     public void Init(SmokeData data, Dictionary<int, BarrierData> _barriers, Vector3[,,] _windarray)
     {
@@ -91,11 +92,10 @@ public class FogController : MonoBehaviour
         
         this.data = data;
         this.center = data.geometryData.position;
+
+        restTime = data.physicalData.duration;
         
         isInit = true;
-        
-        
-        
     }
 
     // Update is called once per frame
@@ -287,9 +287,13 @@ public class FogController : MonoBehaviour
         ClearAccelerations();
 
         // for (int i = 0; i < Random.Range(0, 20); i++)
-        for (int i = 0; i < 30; i++)
+        if (restTime > 0.0f)
         {
-            GenerateParticle();
+            for (int i = 0; i < 30; i++)
+            {
+                GenerateParticle();
+            }
+            restTime -= h;
         }
 
         for (int i = 0; i < pd.Size(); i++) 
