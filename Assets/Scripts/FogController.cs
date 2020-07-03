@@ -449,6 +449,9 @@ public class FogController : MonoBehaviour
         //         Random.Range(0.0f, 1.0f),
         //         Random.Range(-1.0f, 1.0f), 
         //         Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+        // Debug.Log(position);
+        // Debug.Log(position);
+        // Debug.Log(velocity);
 
         model.AddParticle(position, velocity);
         
