@@ -237,6 +237,22 @@ public class GameManager : MonoBehaviour
                 objectData = new WindData(number, "Wind" + number.ToString(), Data.type.WIND, true, cubeGeometryData, 1f, 0f);
                 break;
             }
+            case Data.type.SMOKE: {
+                number = number + 1;
+                CycleGeometryData cycleGeometryData = new CycleGeometryData(
+                    new Vector3(0f, 0.5f, 0f),
+                    0.1f,
+                    new Vector3(0f, 0f, 0f)
+                );
+                PhysicalData physicalData = new PhysicalData(
+                    0.01f,
+                    10.0f,
+                    1000,
+                    3f
+                );
+                objectData = new SmokeData(number, "Smoke" + number.ToString(), Data.type.SMOKE, true, cycleGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
+                break;
+            }
             default : {
                 string logString = "[Error] the " + new Data().dataTypeToString(type) + " object can't be added";
                 addLog(logString);

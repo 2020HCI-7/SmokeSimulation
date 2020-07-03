@@ -12,6 +12,7 @@ public class TwoTypeChooseLineController : MonoBehaviour
 
     private void Start()
     {
+        parentPanel = transform.parent.gameObject;
         addListener();
     }
 

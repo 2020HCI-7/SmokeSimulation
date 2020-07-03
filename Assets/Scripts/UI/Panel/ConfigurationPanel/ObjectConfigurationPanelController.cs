@@ -8,9 +8,10 @@ public class ObjectConfigurationPanelController : MonoBehaviour
     public GameObject commitButtonObject;
     public GameObject groundConfigurationPanel;
     public GameObject lightConfigurationPanel;
-    public GameObject LogSmokeDensityConfigurationPanel;
-    public GameObject BarrierConfigurationPanel;
-    public GameObject WindConfigurationPanel;
+    public GameObject logSmokeDensityConfigurationPanel;
+    public GameObject barrierConfigurationPanel;
+    public GameObject windConfigurationPanel;
+    public GameObject smokeConfigurationPanel;
     private ConfigurationMode configurationMode;
     private Data.type dataType;
     private string addButtonText = "ADD";
@@ -26,9 +27,10 @@ public class ObjectConfigurationPanelController : MonoBehaviour
     {
         groundConfigurationPanel.SetActive(false);
         lightConfigurationPanel.SetActive(false);
-        LogSmokeDensityConfigurationPanel.SetActive(false);
-        BarrierConfigurationPanel.SetActive(false);
-        WindConfigurationPanel.SetActive(false);
+        logSmokeDensityConfigurationPanel.SetActive(false);
+        barrierConfigurationPanel.SetActive(false);
+        windConfigurationPanel.SetActive(false);
+        smokeConfigurationPanel.SetActive(false);
 
         dataType = data.dataType;
         switch (dataType)
@@ -44,19 +46,23 @@ public class ObjectConfigurationPanelController : MonoBehaviour
                 break;
             }
             case Data.type.LOGDENSITY: {
-                LogSmokeDensityConfigurationPanel.SetActive(true);
-                LogSmokeDensityConfigurationPanel.GetComponent<LogDensityConfigurationPanelController>().init((LogSmokeDensityData)data);
+                logSmokeDensityConfigurationPanel.SetActive(true);
+                logSmokeDensityConfigurationPanel.GetComponent<LogDensityConfigurationPanelController>().init((LogSmokeDensityData)data);
                 break;
             }
             case Data.type.BARRIER: {
-                BarrierConfigurationPanel.SetActive(true);
-                BarrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().init((BarrierData)data);
+                barrierConfigurationPanel.SetActive(true);
+                barrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().init((BarrierData)data);
                 break;
             }
             case Data.type.WIND: {
-                Debug.Log("WIND");
-                WindConfigurationPanel.SetActive(true);
-                WindConfigurationPanel.GetComponent<WindConfigurationPanelController>().init((WindData)data);
+                windConfigurationPanel.SetActive(true);
+                windConfigurationPanel.GetComponent<WindConfigurationPanelController>().init((WindData)data);
+                break;
+            }
+            case Data.type.SMOKE: {
+                smokeConfigurationPanel.SetActive(true);
+                smokeConfigurationPanel.GetComponent<SmokeConfigurationPanelController>().init((SmokeData)data);
                 break;
             }
             default: {
@@ -93,15 +99,19 @@ public class ObjectConfigurationPanelController : MonoBehaviour
                 break;
             }
             case Data.type.LOGDENSITY: {
-                data = LogSmokeDensityConfigurationPanel.GetComponent<LogDensityConfigurationPanelController>().getData();
+                data = logSmokeDensityConfigurationPanel.GetComponent<LogDensityConfigurationPanelController>().getData();
                 break;
             }
             case Data.type.BARRIER: {
-                data = BarrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().getData();
+                data = barrierConfigurationPanel.GetComponent<BarrierConfigurationPanelController>().getData();
                 break;
             }
             case Data.type.WIND: {
-                data = WindConfigurationPanel.GetComponent<WindConfigurationPanelController>().getData();
+                data = windConfigurationPanel.GetComponent<WindConfigurationPanelController>().getData();
+                break;
+            }
+            case Data.type.SMOKE: {
+                data = smokeConfigurationPanel.GetComponent<SmokeConfigurationPanelController>().getData();
                 break;
             }
             default : {
@@ -117,9 +127,10 @@ public class ObjectConfigurationPanelController : MonoBehaviour
                 GameManager.instance.addObject(data);
                 groundConfigurationPanel.SetActive(false);
                 lightConfigurationPanel.SetActive(false);
-                LogSmokeDensityConfigurationPanel.SetActive(false);
-                BarrierConfigurationPanel.SetActive(false);
-                WindConfigurationPanel.SetActive(false);
+                logSmokeDensityConfigurationPanel.SetActive(false);
+                barrierConfigurationPanel.SetActive(false);
+                windConfigurationPanel.SetActive(false);
+                smokeConfigurationPanel.SetActive(false);
             }
         }
     }

@@ -11,6 +11,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
     private GameObject positionSetLine;
     private GameObject cycleSetLine;
     private GameObject coneSetLine;
+    private GameObject directionSetLine;
     private GameObject physicalSetLine0;
     private GameObject physicalSetLine1;
     private GameObject colorSetLine;
@@ -29,6 +30,7 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
             positionSetLine.SetActive(false);
             cycleSetLine.SetActive(false);
             coneSetLine.SetActive(false);
+            directionSetLine.SetActive(false);
             physicalSetLine0.SetActive(false);
             physicalSetLine1.SetActive(false);
             colorSetLine.SetActive(false);
@@ -52,39 +54,56 @@ public class SmokeConfigurationPanelController : ObjectConfiguration
         cycleSetLine.SetActive(false);
         coneSetLine.SetActive(false);
 
+        string[] key5 = { "d_x", "d_y", "d_z" };
+        string[] value5 = new string[3];
+
         switch (_smokeData.geometryData.geometryType)
         {
             case GeometryData.GeometryType.CYCLE:
                 cycleSetLine.SetActive(true);
-                cycleSetLine.GetComponent<OneValueSetLineController>().init("cy_r", ((SphereGeometryData)_smokeData.geometryData).r.ToString());
+                cycleSetLine.GetComponent<OneValueSetLineController>().init("cy_r", ((CycleGeometryData)_smokeData.geometryData).r.ToString());
+
+                directionSetLine = transform.GetChild(5).gameObject;
+                directionSetLine.SetActive(true);
+                value5[0] = ((CycleGeometryData)_smokeData.geometryData).direction.x.ToString();
+                value5[1] = ((CycleGeometryData)_smokeData.geometryData).direction.y.ToString();
+                value5[2] = ((CycleGeometryData)_smokeData.geometryData).direction.z.ToString();
+                directionSetLine.GetComponent<ThreeValueSetLineController>().init(key5, value5);
                 break;
             case GeometryData.GeometryType.CONE:
                 coneSetLine.SetActive(true);
                 string[] key4 = { "co_r", "co_h" };
                 string[] value4 = { ((ConeGeometryData)_smokeData.geometryData).r.ToString(), ((ConeGeometryData)_smokeData.geometryData).height.ToString() };
                 coneSetLine.GetComponent<TwoValueSetLineController>().init(key4, value4);
+
+                directionSetLine = transform.GetChild(5).gameObject;
+                directionSetLine.SetActive(true);
+                value5[0] = ((ConeGeometryData)_smokeData.geometryData).direction.x.ToString();
+                value5[1] = ((ConeGeometryData)_smokeData.geometryData).direction.y.ToString();
+                value5[2] = ((ConeGeometryData)_smokeData.geometryData).direction.z.ToString();
+                directionSetLine.GetComponent<ThreeValueSetLineController>().init(key5, value5);
                 break;
             default:
                 break;
         }
 
-        physicalSetLine0 = transform.GetChild(5).gameObject;
+        physicalSetLine0 = transform.GetChild(6).gameObject;
         physicalSetLine0.SetActive(true);
-        string[] key5 = { "duration", "maxNumber" };
-        string[] value5 = { smokeData.physicalData.duration.ToString(), smokeData.physicalData.maxNumber.ToString() };
-        physicalSetLine0.GetComponent<TwoValueSetLineController>().init(key5, value5);
+        string[] key6 = { "duration", "maxNumber" };
+        string[] value6 = { smokeData.physicalData.duration.ToString(), smokeData.physicalData.maxNumber.ToString() };
+        physicalSetLine0.GetComponent<TwoValueSetLineController>().init(key6, value6);
 
-        physicalSetLine1 = transform.GetChild(6).gameObject;
+        physicalSetLine1 = transform.GetChild(7).gameObject;
         physicalSetLine1.SetActive(true);
-        string[] key6 = { "particle size", "speed" };
-        string[] value6 = { smokeData.physicalData.particleSize.ToString(), smokeData.physicalData.speed.ToString() };
-        physicalSetLine1.GetComponent<TwoValueSetLineController>().init(key6, value6);
+        string[] key7 = { "particle size", "speed" };
+        string[] value7 = { smokeData.physicalData.particleSize.ToString(), smokeData.physicalData.speed.ToString() };
+        physicalSetLine1.GetComponent<TwoValueSetLineController>().init(key7, value7);
 
-        colorSetLine = transform.GetChild(7).gameObject;
+        colorSetLine = transform.GetChild(8).gameObject;
         colorSetLine.SetActive(true);
-        string[] key7 = { "R", "G", "B" };
-        string[] value7 = { smokeData.color.r.ToString(), smokeData.color.g.ToString(), smokeData.color.b.ToString() };
-        colorSetLine.GetComponent<ThreeValueSetLineController>().init(key7, value7);
+        string[] key8 = { "R", "G", "B" };
+        string[] value8 = { smokeData.color.r.ToString(), smokeData.color.g.ToString(), smokeData.color.b.ToString() };
+        colorSetLine.GetComponent<ThreeValueSetLineController>().init(key8, value8);
     }
 
     public override void set(string key, string value)
