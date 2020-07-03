@@ -12,6 +12,7 @@ public class WindConfigurationPanelController : ObjectConfiguration
     private GameObject cylinderSetLine;
     private GameObject cubeSetLine;
     private GameObject physicalSetLine;
+    private GameObject directionSetLine;
 
     public void init(WindData _windData)
     {
@@ -33,6 +34,12 @@ public class WindConfigurationPanelController : ObjectConfiguration
         sphereSetLine.SetActive(false);
         cylinderSetLine.SetActive(false);
         cubeSetLine.SetActive(false);
+        
+
+        directionSetLine = transform.GetChild(6).gameObject;
+        directionSetLine.SetActive(false);
+        string[] key6 = new string[3];
+        string[] value6 = new string[3];
 
         switch (_windData.geometryData.geometryType)
         {
@@ -52,6 +59,15 @@ public class WindConfigurationPanelController : ObjectConfiguration
                 string[] key4 = { "length", "width", "height" };
                 string[] value4 = { ((CubeGeometryData)_windData.geometryData).size.x.ToString(), ((CubeGeometryData)_windData.geometryData).size.y.ToString(), ((CubeGeometryData)_windData.geometryData).size.z.ToString() };
                 cubeSetLine.GetComponent<ThreeValueSetLineController>().init(key4, value4);
+
+                key6[0] = "cu_x";
+                key6[1] = "cu_y";
+                key6[2] = "cu_z";
+                directionSetLine.SetActive(true);
+                value6[0] = ((CubeGeometryData)_windData.geometryData).direction.x.ToString();
+                value6[1] = ((CubeGeometryData)_windData.geometryData).direction.y.ToString();
+                value6[2] = ((CubeGeometryData)_windData.geometryData).direction.z.ToString();
+                directionSetLine.GetComponent<ThreeValueSetLineController>().init(key6, value6);
                 break;
             default:
                 break;
@@ -80,7 +96,7 @@ public class WindConfigurationPanelController : ObjectConfiguration
                                 CubeGeometryData cubeGeometryData = new CubeGeometryData(
                                     new Vector3(0f, 0.5f, 0f),
                                     new Vector3(0.2f, 0.2f, 0.2f),
-                                    new Vector3(0f, 0f, 0f)
+                                    new Vector3(0.1f, 0f, 0f)
                                 );
                                 WindData newWindData = new WindData(windData.index, windData.name, Data.type.BARRIER, true, cubeGeometryData, 1f, 0f);
                                 init(newWindData);
@@ -169,6 +185,22 @@ public class WindConfigurationPanelController : ObjectConfiguration
                     case "interfence":
                         {
                             windData.interference = float.Parse(value);
+                            break;
+                        }
+                    //key5 { "cu_x", "cu_y", "cu_z" }
+                    case "cu_x":
+                        {
+                            ((CubeGeometryData)windData.geometryData).direction.x = float.Parse(value);
+                            break;
+                        }
+                    case "cu_y":
+                        {
+                            ((CubeGeometryData)windData.geometryData).direction.y = float.Parse(value);
+                            break;
+                        }
+                    case "cu_z":
+                        {
+                            ((CubeGeometryData)windData.geometryData).direction.y = float.Parse(value);
                             break;
                         }
                     default:
