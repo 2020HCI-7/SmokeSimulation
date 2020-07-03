@@ -105,7 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particleRadius: 0.025
-  maxSize: {x: 10, y: 10, z: 10}
+  maxSize: {x: 4, y: 4, z: 4}
   unitSize: 0.1
   m_velocityUpdateMethod: 0
   windsize: 0
@@ -114,7 +114,9 @@ MonoBehaviour:
     type: 3}
   SolveDensityConstraintCS: {fileID: 7200000, guid: d094aef9d4cf9814ea452bcaf2d03e6e,
     type: 3}
-  gs: 0
+  gsx: 0
+  gsy: 0
+  gsz: 0
   rate: 10
   volume: {fileID: 0}
   center: {x: 0, y: 0, z: 0}
