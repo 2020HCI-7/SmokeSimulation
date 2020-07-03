@@ -10,7 +10,19 @@ public partial class Data
     public bool deletable;
     public enum type 
     {
-        GROUND,    
+        GROUND,
+        LIGHT,
+        LOGDENSITY,
+        BARRIER,
+        WIND,
+        SMOKE,    
+    }
+    public Data()
+    {
+        index = 0;
+        name = "";
+        dataType = type.GROUND;
+        deletable = false;
     }
     public Data(int _index, string _name, type _type, bool _deletable)
     {
@@ -33,7 +45,18 @@ public partial class Data
         switch(_type){
             case type.GROUND:
                 return "GROUND";
+            case type.LIGHT:
+                return "LIGHT";
+            case type.LOGDENSITY:
+                return "LOGDENSITY";
+            case type.BARRIER:
+                return "BARRIER";
+            case type.WIND:
+                return "WIND";
+            case type.SMOKE:
+                return "SMOKE";
+            default :
+                return "";
         }
-        return "";
     }
 }

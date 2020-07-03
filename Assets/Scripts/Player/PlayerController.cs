@@ -7,13 +7,18 @@ public class PlayerController : MonoBehaviour
 {
     public float speed;
     public float rSpeed;
-    public float deltaTime;
+    private float deltaTime;
     public Vector3 rotation;
     float xMouse;
     float yMouse;
+    private bool moveFlag;
+    private float interval;
     // Start is called before the first frame update
     void Start()
     {
+        moveFlag = true;
+        interval = 0;
+        deltaTime = GameManager.instance.deltaTime;
     }
 
     // Update is called once per frame
@@ -24,6 +29,17 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
+        if(Input.GetMouseButton(2)) {
+            if(interval > 0.5f) {
+                moveFlag = !moveFlag;
+                interval = 0;
+            }
+        }
+        interval += deltaTime;
+
+        if(!moveFlag) {
+            return;
+        }
         // Rotation
         xMouse += Input.GetAxis("Mouse X");
         yMouse += Input.GetAxis("Mouse Y");
