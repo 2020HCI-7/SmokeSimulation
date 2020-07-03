@@ -18,7 +18,8 @@ public class FogModel
     //protected float viscosity; // 黏度
     protected float m_particleRadius;
     protected float m_supportRadius;
-    protected List<float> m_density = new List<float>();
+    public List<float> m_density { get; protected set;}
+        = new List<float>();
     protected List<Vector3> m_deltaX = new List<Vector3>();
 
     public FogModel()

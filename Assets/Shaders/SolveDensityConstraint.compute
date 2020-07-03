@@ -7,6 +7,7 @@ CBUFFER_START(Params)
 	float m_k;
 	float m_l;
 	float m_W_zero;
+	float density0;
     int numberOfParticles;
     bool boundaryHandling;
 CBUFFER_END
@@ -19,8 +20,9 @@ RWStructuredBuffer<float3> boundaryX;
 RWStructuredBuffer<float> boundaryPsi;
 RWStructuredBuffer<int> numNeighbors;
 RWStructuredBuffer<int> neighbors;
+RWStructuredBuffer<float> lambda;
 
-RWStructuredBuffer<float> density;
+RWStructuredBuffer<float3> deltaX;
 
 float W(float3 r)
 {
@@ -71,24 +73,22 @@ float W_zero()
 [numthreads(256,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
     int particleIndex = id.x;
-    float densityF = mass[particleIndex] * W_zero();
-    for (int j = 0; j < numNeighbors[particleIndex]; j++)
+    float3 corr = float3(0.0, 0.0, 0.0);
+    for (int j = 0; j < numNeighbors[particleIndex]; j++) 
     {
         int neighborIndex = neighbors[particleIndex*60+j];
         if (neighborIndex < numberOfParticles)
         {
-            densityF += mass[neighborIndex] * W(x[particleIndex] - x[neighborIndex]);
+            float3 gradC_j = -mass[neighborIndex] / density0 * gradW(x[particleIndex] - x[neighborIndex]);
+            corr -= (lambda[particleIndex] + lambda[neighborIndex]) * gradC_j;
         }
         else if (boundaryHandling)
         {
-            densityF += boundaryPsi[neighborIndex - numberOfParticles] * 
-                W(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+            float gradC_j = -boundaryPsi[neighborIndex - numberOfParticles] / density0 
+                * gradW(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+            corr -= (lambda[particleIndex]) * gradC_j;
         }
     }
-
-    // model.setDensity(particleIndex, densityF);
-    density[particleIndex] = densityF;
-    
+    deltaX[particleIndex] = corr;
 }

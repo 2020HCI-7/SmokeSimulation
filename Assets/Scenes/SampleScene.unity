@@ -343,7 +343,11 @@ MonoBehaviour:
   center: {x: 0, y: 0, z: 0}
   maxSize: {x: 4, y: 4, z: 4}
   m_velocityUpdateMethod: 0
-  PBFDensityCS: {fileID: 0}
+  PBFDensityCS: {fileID: 7200000, guid: f728b1e529167ae42ba06b5fbad63ca8, type: 3}
+  PBFLagrangeMultiplierCS: {fileID: 7200000, guid: a04f10a594481ec49a6f59b24729f8a4,
+    type: 3}
+  SolveDensityConstraintCS: {fileID: 7200000, guid: d094aef9d4cf9814ea452bcaf2d03e6e,
+    type: 3}
   gs: 0
   rate: 20
   volume: {fileID: 0}
@@ -453,6 +457,8 @@ MonoBehaviour:
   maxSize: {x: 1, y: 1, z: 1}
   m_velocityUpdateMethod: 0
   PBFDensityCS: {fileID: 0}
+  PBFLagrangeMultiplierCS: {fileID: 0}
+  SolveDensityConstraintCS: {fileID: 0}
   gs: 0
   rate: 10
   volume: {fileID: 0}

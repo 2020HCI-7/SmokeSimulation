@@ -30,6 +30,8 @@ public class FogController : MonoBehaviour
     public int[][][] density;
 
     public ComputeShader PBFDensityCS;
+    public ComputeShader PBFLagrangeMultiplierCS;
+    public ComputeShader SolveDensityConstraintCS;
     public int gs;
     public float rate = 10.0f;
     public Texture3D volume;
@@ -359,7 +361,59 @@ public class FogController : MonoBehaviour
         {
             // float avg_density_err = 0.0f;
             
-            // ComputePBFDensity(
+            ComputePBFDensity(
+                nParticles,
+                pd.m_x,
+                pd.m_masses,
+                model.m_boundaryX,
+                model.m_boundaryPsi,
+                numNeighbors,
+                neighbors,
+                model.m_density0,
+                true
+            );
+            ComputePBFLagrangeMultiplier(
+                nParticles,
+                pd.m_x,
+                pd.m_masses,
+                model.m_boundaryX,
+                model.m_boundaryPsi,
+                model.m_density,
+                numNeighbors,
+                neighbors,
+                model.m_density0,
+                true
+            );
+            // for (int i = 0; i < nParticles; i++) 
+            // {
+            //     ComputePBFDensity(
+            //         i,
+            //         nParticles,
+            //         pd.m_x,
+            //         pd.m_masses,
+            //         model.m_boundaryX,
+            //         model.m_boundaryPsi,
+            //         numNeighbors[i],
+            //         neighbors[i],
+            //         model.m_density0,
+            //         true
+            //     );
+            //     ComputePBFLagrangeMultiplier(
+            //         i,
+            //         nParticles,
+            //         pd.m_x,
+            //         pd.m_masses,
+            //         model.m_boundaryX,
+            //         model.m_boundaryPsi,
+            //         model.getDensity(i),
+            //         numNeighbors[i],
+            //         neighbors[i],
+            //         model.m_density0,
+            //         true
+            //     );
+            // }
+
+            // SolveDensityConstraint(
             //     nParticles,
             //     pd.m_x,
             //     pd.m_masses,
@@ -368,256 +422,440 @@ public class FogController : MonoBehaviour
             //     numNeighbors,
             //     neighbors,
             //     model.m_density0,
-            //     true
+            //     true,
+            //     model.m_lambda
             // );
-            for (int i = 0; i < nParticles; i++) 
-            {
-                ComputePBFDensity(
-                    i,
-                    nParticles,
-                    pd.m_x,
-                    pd.m_masses,
-                    model.m_boundaryX,
-                    model.m_boundaryPsi,
-                    numNeighbors[i],
-                    neighbors[i],
-                    model.m_density0,
-                    true
-                );
-                ComputePBFLagrangeMultiplier(
-                    i,
-                    nParticles,
-                    pd.m_x,
-                    pd.m_masses,
-                    model.m_boundaryX,
-                    model.m_boundaryPsi,
-                    model.getDensity(i),
-                    numNeighbors[i],
-                    neighbors[i],
-                    model.m_density0,
-                    true
-                );
-            }
+            // for (int i = 0; i < nParticles; i++)
+            // {
+            //     SolveDensityConstraint(
+            //         i,
+            //         nParticles,
+            //         pd.m_x,
+            //         pd.m_masses,
+            //         model.m_boundaryX,
+            //         model.m_boundaryPsi,
+            //         numNeighbors[i],
+            //         neighbors[i],
+            //         model.m_density0,
+            //         true,
+            //         model.m_lambda
+            //     );
+            // }
 
-            for (int i = 0; i < nParticles; i++)
-            {
-                SolveDensityConstraint(
-                    i,
-                    nParticles,
-                    pd.m_x,
-                    pd.m_masses,
-                    model.m_boundaryX,
-                    model.m_boundaryPsi,
-                    numNeighbors[i],
-                    neighbors[i],
-                    model.m_density0,
-                    true,
-                    model.m_lambda
-                );
-            }
-
-            for (int i = 0; i < nParticles; i++)
-            {
-                pd.SetPosition(i, pd.GetPosition(i) + model.getDeltaX(i));
-            }
+            // for (int i = 0; i < nParticles; i++)
+            // {
+            //     Debug.Log(model.getDeltaX(i));
+            //     pd.SetPosition(i, pd.GetPosition(i) + model.getDeltaX(i));
+            // }
 
             iter++;
         }
     }
 
+    // bool ComputePBFDensity(
+    //     int particleIndex,
+    //     int numberOfParticles,
+    //     List<Vector3> x,
+    //     List<float> mass,
+    //     List<Vector3> boundaryX,
+    //     List<float> boundaryPsi,
+    //     int numNeighbors,
+    //     int[] neighbors,
+    //     float density0,
+    //     bool boundaryHandling
+    //     )
+    // {
+    //     float density = mass[particleIndex] * CubicKernel.W_zero();
+    //     for (int j = 0; j < numNeighbors; j++)
+    //     {
+    //         int neighborIndex = neighbors[j];
+    //         if (neighborIndex < numberOfParticles)
+    //         {
+    //             density += mass[neighborIndex] * CubicKernel.W(x[particleIndex] - x[neighborIndex]);
+    //         }
+    //         else if (boundaryHandling)
+    //         {
+    //             density += boundaryPsi[neighborIndex - numberOfParticles] * 
+    //                 CubicKernel.W(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+    //         }
+    //     }
+
+    //     model.setDensity(particleIndex, density);
+    //     return true;
+    // }
+    ComputeBuffer XBuffer;
+    ComputeBuffer massBuffer;
+    ComputeBuffer boundaryXBuffer;
+    ComputeBuffer boundaryPsiBuffer;
+    ComputeBuffer numNeighborsBuffer;
+    ComputeBuffer neighborsBuffer;
+    ComputeBuffer densityBuffer;
+
     bool ComputePBFDensity(
-        int particleIndex,
         int numberOfParticles,
         List<Vector3> x,
         List<float> mass,
         List<Vector3> boundaryX,
         List<float> boundaryPsi,
-        int numNeighbors,
-        int[] neighbors,
+        int[] numNeighbors,
+        int[][] neighbors,
         float density0,
         bool boundaryHandling
         )
     {
-        float density = mass[particleIndex] * CubicKernel.W_zero();
-        for (int j = 0; j < numNeighbors; j++)
+        if (XBuffer == null || XBuffer.count != numberOfParticles)
         {
-            int neighborIndex = neighbors[j];
-            if (neighborIndex < numberOfParticles)
+            if (XBuffer != null) 
+                XBuffer.Release();
+            if (massBuffer != null) 
+                massBuffer.Release();
+            if (boundaryXBuffer != null) 
+                boundaryXBuffer.Release();
+            if (boundaryPsiBuffer != null) 
+                boundaryPsiBuffer.Release();
+            if (numNeighborsBuffer != null) 
+                numNeighborsBuffer.Release();
+            if (neighborsBuffer != null) 
+                neighborsBuffer.Release();
+            if (densityBuffer != null)
+                densityBuffer.Release();
+            XBuffer = new ComputeBuffer(numberOfParticles, 12);
+            massBuffer = new ComputeBuffer(numberOfParticles, 4);
+            boundaryXBuffer = new ComputeBuffer(numberOfParticles, 12);
+            boundaryPsiBuffer = new ComputeBuffer(numberOfParticles, 4);
+            numNeighborsBuffer = new ComputeBuffer(numberOfParticles, 4);
+            neighborsBuffer = new ComputeBuffer(numberOfParticles, 240);
+            densityBuffer = new ComputeBuffer(numberOfParticles, 4);
+        }
+
+        int[] tempNeighbors = new int[numberOfParticles*60];
+        int index = 0;
+        for (int i = 0; i < numberOfParticles; i++)
+        {
+            for (int j = 0; j < 60; j++)
             {
-                density += mass[neighborIndex] * CubicKernel.W(x[particleIndex] - x[neighborIndex]);
-            }
-            else if (boundaryHandling)
-            {
-                density += boundaryPsi[neighborIndex - numberOfParticles] * 
-                    CubicKernel.W(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+                tempNeighbors[index++] = neighbors[i][j];
             }
         }
 
-        model.setDensity(particleIndex, density);
+        XBuffer.SetData(x);
+        massBuffer.SetData(mass);
+        boundaryXBuffer.SetData(boundaryX);
+        boundaryPsiBuffer.SetData(boundaryPsi);
+        numNeighborsBuffer.SetData(numNeighbors);
+        neighborsBuffer.SetData(tempNeighbors);
+
+        var kernel = PBFDensityCS.FindKernel("CSMain");
+        PBFDensityCS.SetFloat("m_radius", CubicKernel.m_radius);
+        PBFDensityCS.SetFloat("m_k", CubicKernel.m_k);
+        PBFDensityCS.SetFloat("m_l", CubicKernel.m_l);
+        PBFDensityCS.SetFloat("m_W_zero", CubicKernel.m_W_zero);
+        PBFDensityCS.SetInt("numberOfParticles", numberOfParticles);
+        PBFDensityCS.SetBool("boundaryHandling", true);
+
+        PBFDensityCS.SetBuffer(kernel, "x", XBuffer);
+        PBFDensityCS.SetBuffer(kernel, "mass", massBuffer);
+        PBFDensityCS.SetBuffer(kernel, "boundaryX", boundaryXBuffer);
+        PBFDensityCS.SetBuffer(kernel, "boundaryPsi", boundaryPsiBuffer);
+        PBFDensityCS.SetBuffer(kernel, "numNeighbors", numNeighborsBuffer);
+        PBFDensityCS.SetBuffer(kernel, "neighbors", neighborsBuffer);
+
+        PBFDensityCS.SetBuffer(kernel, "density", densityBuffer);
+
+        PBFDensityCS.Dispatch(kernel, 8, 1, 1);
+
+        float[] density = new float[numberOfParticles];
+        densityBuffer.GetData(density);
+
+        for (int i = 0; i < numberOfParticles; i++) 
+        {
+            model.setDensity(i, density[i]);
+        }
+
         return true;
     }
-    // ComputeBuffer PBFDensity_XBuffer;
-    // ComputeBuffer PBFDensity_massBuffer;
-    // ComputeBuffer PBFDensity_boundaryXBuffer;
-    // ComputeBuffer PBFDensity_boundaryPsiBuffer;
-    // ComputeBuffer PBFDensity_numNeighborsBuffer;
-    // ComputeBuffer PBFDensity_neighborsBuffer;
-    // ComputeBuffer PBFDensity_densityBuffer;
 
-    // bool ComputePBFDensity(
+    // bool ComputePBFLagrangeMultiplier(
+    //     int particleIndex,
+    //     int numberOfParticles,
+    //     List<Vector3> x,
+    //     List<float> mass,
+    //     List<Vector3> boundaryX,
+    //     List<float> boundaryPsi,
+    //     float density,
+    //     int numNeighbors,
+    //     int[] neighbors,
+    //     float density0,
+    //     bool boundaryHandling
+    //     )
+    // {
+    //     float c = Mathf.Max(density / density0 - 1.0f, 0.0f);
+    //     float lambda;
+
+    //     if (c != 0.0f)
+    //     {
+    //         float sum_grad_C2 = 0.0f;
+    //         Vector3 gradC_i = Vector3.zero;
+
+    //         for (int j = 0; j < numNeighbors; j++)
+    //         {
+    //             int neighborIndex = neighbors[j];
+    //             if (neighborIndex < numberOfParticles)
+    //             {
+    //                 Vector3 gradC_j = -mass[neighborIndex] / density0 * 
+    //                     CubicKernel.gradW(x[particleIndex] - x[neighborIndex]);
+    //                 sum_grad_C2 += gradC_j.magnitude * gradC_j.magnitude;
+    //                 gradC_i -= gradC_j;
+    //             }
+    //             else if (boundaryHandling)
+    //             {
+    //                 Vector3 gradC_j = -boundaryPsi[neighborIndex - numberOfParticles] / density0 * 
+    //                     CubicKernel.gradW(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+    //                 sum_grad_C2 += gradC_j.magnitude * gradC_j.magnitude;
+    //                 gradC_i -= gradC_j;
+    //             }
+    //         }
+
+    //         sum_grad_C2 += gradC_i.magnitude * gradC_i.magnitude;
+
+	// 	    // Compute lambda
+    //         lambda = -c / (sum_grad_C2);
+    //     }
+    //     else
+    //     {
+    //         lambda = 0.0f;
+    //     }
+
+    //     model.setLambda(particleIndex, lambda);
+    //     return true;
+    // }
+
+    ComputeBuffer lambdaBuffer;
+
+    bool ComputePBFLagrangeMultiplier(
+        int numberOfParticles,
+        List<Vector3> x,
+        List<float> mass,
+        List<Vector3> boundaryX,
+        List<float> boundaryPsi,
+        List<float> m_density,
+        int[] numNeighbors,
+        int[][] neighbors,
+        float density0,
+        bool boundaryHandling
+        )
+    {
+        if (XBuffer == null || XBuffer.count != numberOfParticles)
+        {
+            if (XBuffer != null) 
+                XBuffer.Release();
+            if (massBuffer != null) 
+                massBuffer.Release();
+            if (boundaryXBuffer != null) 
+                boundaryXBuffer.Release();
+            if (boundaryPsiBuffer != null) 
+                boundaryPsiBuffer.Release();
+            if (numNeighborsBuffer != null) 
+                numNeighborsBuffer.Release();
+            if (neighborsBuffer != null) 
+                neighborsBuffer.Release();
+            if (densityBuffer != null)
+                densityBuffer.Release();
+            XBuffer = new ComputeBuffer(numberOfParticles, 12);
+            massBuffer = new ComputeBuffer(numberOfParticles, 4);
+            boundaryXBuffer = new ComputeBuffer(numberOfParticles, 12);
+            boundaryPsiBuffer = new ComputeBuffer(numberOfParticles, 4);
+            numNeighborsBuffer = new ComputeBuffer(numberOfParticles, 4);
+            neighborsBuffer = new ComputeBuffer(numberOfParticles, 240);
+            densityBuffer = new ComputeBuffer(numberOfParticles, 4);
+        }
+        
+        if (lambdaBuffer == null || lambdaBuffer.count != numberOfParticles)
+        {
+            if (lambdaBuffer != null)
+                lambdaBuffer.Release();
+            lambdaBuffer = new ComputeBuffer(numberOfParticles, 4);
+        }
+
+        int[] tempNeighbors = new int[numberOfParticles*60];
+        int index = 0;
+        for (int i = 0; i < numberOfParticles; i++)
+        {
+            for (int j = 0; j < 60; j++)
+            {
+                tempNeighbors[index++] = neighbors[i][j];
+            }
+        }
+
+        XBuffer.SetData(x);
+        massBuffer.SetData(mass);
+        boundaryXBuffer.SetData(boundaryX);
+        boundaryPsiBuffer.SetData(boundaryPsi);
+        numNeighborsBuffer.SetData(numNeighbors);
+        neighborsBuffer.SetData(tempNeighbors);
+        densityBuffer.SetData(m_density);
+
+        var kernel = PBFLagrangeMultiplierCS.FindKernel("CSMain");
+        PBFDensityCS.SetFloat("m_radius", CubicKernel.m_radius);
+        PBFDensityCS.SetFloat("m_k", CubicKernel.m_k);
+        PBFDensityCS.SetFloat("m_l", CubicKernel.m_l);
+        PBFDensityCS.SetFloat("m_W_zero", CubicKernel.m_W_zero);
+        PBFDensityCS.SetFloat("density0", density0);
+        PBFDensityCS.SetInt("numberOfParticles", numberOfParticles);
+        PBFDensityCS.SetBool("boundaryHandling", true);
+
+        PBFDensityCS.SetBuffer(kernel, "x", XBuffer);
+        PBFDensityCS.SetBuffer(kernel, "mass", massBuffer);
+        PBFDensityCS.SetBuffer(kernel, "boundaryX", boundaryXBuffer);
+        PBFDensityCS.SetBuffer(kernel, "boundaryPsi", boundaryPsiBuffer);
+        PBFDensityCS.SetBuffer(kernel, "numNeighbors", numNeighborsBuffer);
+        PBFDensityCS.SetBuffer(kernel, "neighbors", neighborsBuffer);
+        PBFDensityCS.SetBuffer(kernel, "density", densityBuffer);
+
+        PBFDensityCS.SetBuffer(kernel, "lambda", lambdaBuffer);
+
+        PBFDensityCS.Dispatch(kernel, 8, 1, 1);
+
+        float[] lambdaArray = new float[numberOfParticles];
+        lambdaBuffer.GetData(lambdaArray);
+
+        for (int i = 0; i < numberOfParticles; i++) 
+        {
+            model.setLambda(i, lambdaArray[i]);
+        }
+
+        return true;
+    }
+
+    // bool SolveDensityConstraint(
+    //     int particleIndex,
+    //     int numberOfParticles,
+    //     List<Vector3> x,
+    //     List<float> mass,
+    //     List<Vector3> boundaryX,
+    //     List<float> boundaryPsi,
+    //     int numNeighbors,
+    //     int[] neighbors,
+    //     float density0,
+    //     bool boundaryHandling,
+    //     List<float> lambda
+    //     )
+    // {
+    //     Vector3 corr = Vector3.zero;
+    //     for (int j = 0; j < numNeighbors; j++) 
+    //     {
+    //         int neighborIndex = neighbors[j];
+    //         if (neighborIndex < numberOfParticles)
+    //         {
+    //             Vector3 gradC_j = -mass[neighborIndex] / density0 * CubicKernel.gradW(x[particleIndex] - x[neighborIndex]);
+    //             corr -= (lambda[particleIndex] + lambda[neighborIndex]) * gradC_j;
+    //         }
+    //         else if (boundaryHandling)
+    //         {
+    //             Vector3 gradC_j = -boundaryPsi[neighborIndex - numberOfParticles] / density0 
+    //                 * CubicKernel.gradW(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
+    //             corr -= (lambda[particleIndex]) * gradC_j;
+    //         }
+    //     }
+    //     model.setDeltaX(particleIndex, corr);
+
+    //     return true;
+    // }
+    // ComputeBuffer deltaXBuffer;
+    // bool SolveDensityConstraint(
     //     int numberOfParticles,
     //     List<Vector3> x,
     //     List<float> mass,
     //     List<Vector3> boundaryX,
     //     List<float> boundaryPsi,
     //     int[] numNeighbors,
-    //     int[] neighbors,
+    //     int[][] neighbors,
     //     float density0,
-    //     bool boundaryHandling
+    //     bool boundaryHandling,
+    //     List<float> m_lambda
     //     )
     // {
-    //     if (PBFDensity_XBuffer == null || PBFDensity_XBuffer.count != numberOfParticles)
+    //     if (XBuffer == null || XBuffer.count != numberOfParticles)
     //     {
-    //         if (PBFDensity_XBuffer != null) 
-    //             PBFDensity_XBuffer.Release();
-    //         if (PBFDensity_massBuffer != null) 
-    //             PBFDensity_massBuffer.Release();
-    //         if (PBFDensity_boundaryXBuffer != null) 
-    //             PBFDensity_boundaryXBuffer.Release();
-    //         if (PBFDensity_boundaryPsiBuffer != null) 
-    //             PBFDensity_boundaryPsiBuffer.Release();
-    //         if (PBFDensity_numNeighborsBuffer != null) 
-    //             PBFDensity_numNeighborsBuffer.Release();
-    //         if (PBFDensity_neighborsBuffer != null) 
-    //             PBFDensity_neighborsBuffer.Release();
-    //         if (PBFDensity_densityBuffer != null)
-    //             PBFDensity_densityBuffer.Release();
-    //         PBFDensity_XBuffer = new ComputeBuffer(numberOfParticles, 12);
-    //         PBFDensity_massBuffer = new ComputeBuffer(numberOfParticles, 4);
-    //         PBFDensity_boundaryXBuffer = new ComputeBuffer(numberOfParticles, 12);
-    //         PBFDensity_boundaryPsiBuffer = new ComputeBuffer(numberOfParticles, 4);
-    //         PBFDensity_numNeighborsBuffer = new ComputeBuffer(numberOfParticles, 4);
-    //         PBFDensity_neighborsBuffer = new ComputeBuffer(numberOfParticles, 240);
-    //         PBFDensity_densityBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         if (XBuffer != null) 
+    //             XBuffer.Release();
+    //         if (massBuffer != null) 
+    //             massBuffer.Release();
+    //         if (boundaryXBuffer != null) 
+    //             boundaryXBuffer.Release();
+    //         if (boundaryPsiBuffer != null) 
+    //             boundaryPsiBuffer.Release();
+    //         if (numNeighborsBuffer != null) 
+    //             numNeighborsBuffer.Release();
+    //         if (neighborsBuffer != null) 
+    //             neighborsBuffer.Release();
+    //         if (lambdaBuffer != null)
+    //             lambdaBuffer.Release();
+    //         XBuffer = new ComputeBuffer(numberOfParticles, 12);
+    //         massBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         boundaryXBuffer = new ComputeBuffer(numberOfParticles, 12);
+    //         boundaryPsiBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         numNeighborsBuffer = new ComputeBuffer(numberOfParticles, 4);
+    //         neighborsBuffer = new ComputeBuffer(numberOfParticles, 240);
+    //         lambdaBuffer = new ComputeBuffer(numberOfParticles, 4);
     //     }
-    //     PBFDensity_XBuffer.SetData(x);
-    //     PBFDensity_massBuffer.SetData(mass);
-    //     PBFDensity_boundaryXBuffer.SetData(boundaryX);
-    //     PBFDensity_boundaryPsiBuffer.SetData(boundaryPsi);
-    //     PBFDensity_numNeighborsBuffer.SetData(numNeighbors);
-    //     PBFDensity_neighborsBuffer.SetData(neighbors);
+        
+    //     if (deltaXBuffer == null || deltaXBuffer.count != numberOfParticles)
+    //     {
+    //         if (deltaXBuffer != null)
+    //             deltaXBuffer.Release();
+    //         deltaXBuffer = new ComputeBuffer(numberOfParticles, 12);
+    //     }
 
-    //     var kernel = PBFDensityCS.FindKernel("CSMain");
+    //     int[] tempNeighbors = new int[numberOfParticles*60];
+    //     int index = 0;
+    //     for (int i = 0; i < numberOfParticles; i++)
+    //     {
+    //         for (int j = 0; j < 60; j++)
+    //         {
+    //             tempNeighbors[index++] = neighbors[i][j];
+    //         }
+    //     }
+
+    //     XBuffer.SetData(x);
+    //     massBuffer.SetData(mass);
+    //     boundaryXBuffer.SetData(boundaryX);
+    //     boundaryPsiBuffer.SetData(boundaryPsi);
+    //     numNeighborsBuffer.SetData(numNeighbors);
+    //     neighborsBuffer.SetData(tempNeighbors);
+    //     lambdaBuffer.SetData(m_lambda);
+
+    //     var kernel = SolveDensityConstraintCS.FindKernel("CSMain");
     //     PBFDensityCS.SetFloat("m_radius", CubicKernel.m_radius);
     //     PBFDensityCS.SetFloat("m_k", CubicKernel.m_k);
     //     PBFDensityCS.SetFloat("m_l", CubicKernel.m_l);
     //     PBFDensityCS.SetFloat("m_W_zero", CubicKernel.m_W_zero);
+    //     PBFDensityCS.SetFloat("density0", density0);
     //     PBFDensityCS.SetInt("numberOfParticles", numberOfParticles);
     //     PBFDensityCS.SetBool("boundaryHandling", true);
 
-    //     PBFDensityCS.SetBuffer(kernel, "x", PBFDensity_XBuffer);
-    //     PBFDensityCS.SetBuffer(kernel, "mass", PBFDensity_massBuffer);
-    //     PBFDensityCS.SetBuffer(kernel, "boundaryX", PBFDensity_boundaryXBuffer);
-    //     PBFDensityCS.SetBuffer(kernel, "boundaryPsi", PBFDensity_boundaryPsiBuffer);
-    //     PBFDensityCS.SetBuffer(kernel, "numNeighbors", PBFDensity_numNeighborsBuffer);
-    //     PBFDensityCS.SetBuffer(kernel, "neighbors", PBFDensity_neighborsBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "x", XBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "mass", massBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "boundaryX", boundaryXBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "boundaryPsi", boundaryPsiBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "numNeighbors", numNeighborsBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "neighbors", neighborsBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "lambda", lambdaBuffer);
 
-    //     PBFDensityCS.SetBuffer(kernel, "density", PBFDensity_densityBuffer);
+    //     PBFDensityCS.SetBuffer(kernel, "deltaX", deltaXBuffer);
 
     //     PBFDensityCS.Dispatch(kernel, 8, 1, 1);
 
+    //     Vector3[] deltaX = new Vector3[numberOfParticles];
+    //     deltaXBuffer.GetData(deltaX);
+
+    //     for (int i = 0; i < numberOfParticles; i++) 
+    //     {
+    //         model.setDeltaX(i, deltaX[i]);
+    //     }
+
     //     return true;
     // }
-
-    bool ComputePBFLagrangeMultiplier(
-        int particleIndex,
-        int numberOfParticles,
-        List<Vector3> x,
-        List<float> mass,
-        List<Vector3> boundaryX,
-        List<float> boundaryPsi,
-        float density,
-        int numNeighbors,
-        int[] neighbors,
-        float density0,
-        bool boundaryHandling
-        )
-    {
-        float c = Mathf.Max(density / density0 - 1.0f, 0.0f);
-        float lambda;
-
-        if (c != 0.0f)
-        {
-            float sum_grad_C2 = 0.0f;
-            Vector3 gradC_i = Vector3.zero;
-
-            for (int j = 0; j < numNeighbors; j++)
-            {
-                int neighborIndex = neighbors[j];
-                if (neighborIndex < numberOfParticles)
-                {
-                    Vector3 gradC_j = -mass[neighborIndex] / density0 * 
-                        CubicKernel.gradW(x[particleIndex] - x[neighborIndex]);
-                    sum_grad_C2 += gradC_j.magnitude * gradC_j.magnitude;
-                    gradC_i -= gradC_j;
-                }
-                else if (boundaryHandling)
-                {
-                    Vector3 gradC_j = -boundaryPsi[neighborIndex - numberOfParticles] / density0 * 
-                        CubicKernel.gradW(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
-                    sum_grad_C2 += gradC_j.magnitude * gradC_j.magnitude;
-                    gradC_i -= gradC_j;
-                }
-            }
-
-            sum_grad_C2 += gradC_i.magnitude * gradC_i.magnitude;
-
-		    // Compute lambda
-            lambda = -c / (sum_grad_C2);
-        }
-        else
-        {
-            lambda = 0.0f;
-        }
-
-        model.setLambda(particleIndex, lambda);
-        return true;
-    }
-
-    bool SolveDensityConstraint(
-        int particleIndex,
-        int numberOfParticles,
-        List<Vector3> x,
-        List<float> mass,
-        List<Vector3> boundaryX,
-        List<float> boundaryPsi,
-        int numNeighbors,
-        int[] neighbors,
-        float density0,
-        bool boundaryHandling,
-        List<float> lambda
-        )
-    {
-        Vector3 corr = Vector3.zero;
-        for (int j = 0; j < numNeighbors; j++) 
-        {
-            int neighborIndex = neighbors[j];
-            if (neighborIndex < numberOfParticles)
-            {
-                Vector3 gradC_j = -mass[neighborIndex] / density0 * CubicKernel.gradW(x[particleIndex] - x[neighborIndex]);
-                corr -= (lambda[particleIndex] + lambda[neighborIndex]) * gradC_j;
-            }
-            else if (boundaryHandling)
-            {
-                Vector3 gradC_j = -boundaryPsi[neighborIndex - numberOfParticles] / density0 
-                    * CubicKernel.gradW(x[particleIndex] - boundaryX[neighborIndex - numberOfParticles]);
-                corr -= (lambda[particleIndex]) * gradC_j;
-            }
-        }
-        model.setDeltaX(particleIndex, corr);
-
-        return true;
-    }
 
     void VelocityUpdateFirstOrder(
         int particleIndex,
