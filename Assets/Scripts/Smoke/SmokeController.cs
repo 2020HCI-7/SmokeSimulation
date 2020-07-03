@@ -9,6 +9,9 @@ public class SmokeController : MonoBehaviour
     private Dictionary<int, SmokeData> smokeObjectsData;
     private Dictionary<int, GameObject> smokeObjects;
 
+    private Dictionary<int, BarrierData> barrierData;
+    private Vector3[,,] windArray;
+
     private bool barrierDirtyFlag;//为true时表示数据为dirty
     private bool windDirtyFlag;//为true时表示数据为dirty
 
@@ -27,7 +30,7 @@ public class SmokeController : MonoBehaviour
 
         GameObject go = Instantiate(smokeSource, data.geometryData.position, Quaternion.identity, transform);
         FogController fogC = go.GetComponent<FogController>();
-        fogC.Init(data);
+        fogC.Init(data, barrierData, windArray);
         smokeObjects.Add(data.index, go);
 
         switch (data.geometryData.geometryType)
@@ -84,19 +87,21 @@ public class SmokeController : MonoBehaviour
         return density;
     }
 
-    public void setBarrierData(Dictionary<int, BarrierData> barrierData)
+    public void setBarrierData(Dictionary<int, BarrierData> _barrierData)
     {
+        barrierData = _barrierData;
         foreach (var item in smokeObjects)
         {
-            item.Value.GetComponent<FogController>().setBarrierData(barrierData);
+            item.Value.GetComponent<FogController>().setBarrierData(_barrierData);
         }
     }
 
-    public void setWindArray(Vector3[,,] windArray)
+    public void setWindArray(Vector3[,,] _windArray)
     {
+        windArray = _windArray;
         foreach (var item in smokeObjects)
         {
-            item.Value.GetComponent<FogController>().setWindArray(windArray);
+            item.Value.GetComponent<FogController>().setWindArray(_windArray);
         }
     }
 }

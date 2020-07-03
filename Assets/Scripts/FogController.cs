@@ -65,7 +65,7 @@ public class FogController : MonoBehaviour
 
     private bool isInit = false;
 
-    public void Init(SmokeData data)
+    public void Init(SmokeData data, Dictionary<int, BarrierData> _barriers, Vector3[,,] _windarray)
     {
         // gs = (int)(maxSize.x / unitSize);
         gsx = (int)(maxSize.x / unitSize);
@@ -84,7 +84,8 @@ public class FogController : MonoBehaviour
                 }
             }
         }
-        barriers = new Dictionary<int, BarrierData>();
+        barriers = _barriers;
+        windarray = _windarray;
         InitFogParticles();
         InitBoundary();
         
@@ -1105,7 +1106,7 @@ public class FogController : MonoBehaviour
 
     public void setBarrierData(Dictionary<int, BarrierData> barrierData)
     {
-        
+
     }
 
 #endregion
