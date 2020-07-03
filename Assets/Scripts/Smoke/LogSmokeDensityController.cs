@@ -31,7 +31,7 @@ public class LogSmokeDensityController : MonoBehaviour
                 time = 0f;
                 Vector3 position = player.GetComponent<PlayerController>().getFocus();
                 int number = gameObject.GetComponent<SmokeController>().getSmokeDensity(position);
-                GameManager.instance.addLog("[Density] There are "+ number.ToString() +" particles in a 0.001(0.1 * 0.1 * 0.1) space");
+                GameManager.instance.addLog("[Density] There are "+ number.ToString() +" particles in " + position.ToString());
             }
         }
     }

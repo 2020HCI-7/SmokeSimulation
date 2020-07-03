@@ -111,9 +111,15 @@ public class WindController : MonoBehaviour
                 int sizeX = (int)(cubeGeometryData.size.x / 0.1f);
                 int sizeY = (int)(cubeGeometryData.size.y / 0.1f);
                 int sizeZ = (int)(cubeGeometryData.size.z / 0.1f);
-                int beginX = (int)((position.x + 2f ) / 0.1f) - sizeX / 2;
-                int beginY = (int)((position.y + 2f ) / 0.1f) - sizeY / 2;
-                int beginZ = (int)((position.z + 2f ) / 0.1f) - sizeZ / 2;
+                int beginX = (int)((position.x) / 0.1f) - sizeX / 2 + size / 2;
+                int beginY = (int)((position.y) / 0.1f) - sizeY / 2;
+                int beginZ = (int)((position.z) / 0.1f) - sizeZ / 2 + size / 2;
+                // Debug.Log(sizeX);
+                // Debug.Log(sizeY);
+                // Debug.Log(sizeZ);
+                // Debug.Log(beginX);
+                // Debug.Log(beginY);
+                // Debug.Log(beginZ);
                 for (int i = 0; i < sizeX; i++)
                 {
                     for (int j = 0; j < sizeZ; j++)
@@ -121,6 +127,7 @@ public class WindController : MonoBehaviour
                         for (int k = 0; k < sizeY; k++)
                         {
                             windArray[i + beginX, j + beginY, k + beginZ] = objectArray[i, j, k];
+                            // Debug.Log((objectArray[i,j,k]));
                         }
                     }
                 }
@@ -152,8 +159,9 @@ public class WindController : MonoBehaviour
                     int sizeY = (int)(cubeGeometryData.size.y / 0.1f);
                     int sizeZ = (int)(cubeGeometryData.size.z / 0.1f);
                     int beginX = (int)((position.x) / 0.1f) - sizeX / 2 + size / 2;
-                    int beginY = (int)((position.y) / 0.1f) - sizeY / 2 + size / 2;
+                    int beginY = (int)((position.y) / 0.1f) - sizeY / 2;
                     int beginZ = (int)((position.z) / 0.1f) - sizeZ / 2 + size / 2;
+                    
                     for (int i = 0; i < sizeX; i++)
                     {
                         for (int j = 0; j < sizeZ; j++)
@@ -161,6 +169,7 @@ public class WindController : MonoBehaviour
                             for (int k = 0; k < sizeY; k++)
                             {
                                 windArray[i + beginX, j + beginY, k + beginZ] = objectArray[i, j, k];
+                                // Debug.Log(objectArray[i, j, k]);
                             }
                         }
                     }
@@ -187,6 +196,7 @@ public class WindController : MonoBehaviour
 
                 Vector3 wind = cubeGeometryData.direction;
                 wind = wind * intensity;
+                // Debug.Log(cubeGeometryData.direction);
                 // Debug.Log(wind);
 
                 Vector3 noiseVector = new Vector3(0, 1, 0) * (float)noiseValue;
@@ -195,6 +205,7 @@ public class WindController : MonoBehaviour
                 // Debug.Log(noiseVector);
 
                 wind = wind + noiseVector;
+                // Debug.Log(wind);
 
                 for (int k = 0; k < sizeY; k++)
                 {
