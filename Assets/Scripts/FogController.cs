@@ -94,8 +94,6 @@ public class FogController : MonoBehaviour
         this.center = data.geometryData.position;
         
         restTime = data.physicalData.duration;
-
-        this.barriers = mybarries;
         isInit = true;
     }
 
@@ -400,6 +398,16 @@ public class FogController : MonoBehaviour
                 Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
                 float r = ((ConeGeometryData)data.geometryData).r;
                 float height = ((ConeGeometryData)data.geometryData).height;
+
+                if(height == 0) {
+                    position = center;
+                    velocity = 
+                        (new Vector3(
+                            Random.Range(-1.0f, 1.0f),
+                            Random.Range(-1.0f, 1.0f), 
+                            Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+                    break;
+                }
                 
                 float randomX;
                 float randomY;
