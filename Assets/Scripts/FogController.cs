@@ -89,7 +89,7 @@ public class FogController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (isInit)
         {
@@ -121,13 +121,12 @@ public class FogController : MonoBehaviour
                 {
                     if (density[i][j][k] > rate * 0.3f)
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, 0.3f);
                     }
                     else
                     {
-                        colors[i + j * gsx + k * gsx * gsy] = new Color(1.0f, 1.0f, 1.0f, density[i][j][k] / rate);
+                        colors[i + j * gsx + k * gsx * gsy] = new Color(data.color.r, data.color.g, data.color.b, density[i][j][k] / rate);
                     }
-
                 }
             }
         }
