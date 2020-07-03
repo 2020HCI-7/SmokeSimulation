@@ -278,7 +278,8 @@ public class FogController : MonoBehaviour
 
         ClearAccelerations();
 
-        for (int i = 0; i < Random.Range(0, 20); i++)
+        // for (int i = 0; i < Random.Range(0, 20); i++)
+        for (int i = 0; i < 30; i++)
         {
             GenerateParticle();
         }
@@ -292,7 +293,7 @@ public class FogController : MonoBehaviour
             pd.SetVelocity(i, velocity);
             Vector3 position = pd.GetPosition(i) + h * pd.GetVelocity(i);
             pd.SetPosition(i, position);
-            // particleGameobjects[i].transform.position = position;
+            particleGameobjects[i].transform.position = position;
             
             Vector3 delta = position - center;
             if (delta.x > maxSize.x/2 || delta.x < -maxSize.x/2 || 
@@ -349,57 +350,62 @@ public class FogController : MonoBehaviour
     {
         Vector3 position;
         Vector3 velocity;
-        switch (data.geometryData.geometryType)
-        {
-            case GeometryData.GeometryType.CONE :
-            {
-                Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
-                float r = ((ConeGeometryData)data.geometryData).r;
-                float height = ((ConeGeometryData)data.geometryData).height;
-
-                float randomX = Random.Range(-1.0f, 1.0f);
-                float randomY = Random.Range(-1.0f, 1.0f);
-                float z = (direction.x * randomX + direction.y * randomY) / direction.z;
-
-                position = center;
-                velocity = 
-                    (direction * height + (new Vector3(randomX, randomY, z)).normalized * Random.Range(0, r)).normalized
-                    * data.physicalData.speed;
-                break;
-            }
-            case GeometryData.GeometryType.CYCLE :
-            {
-                Vector3 direction = ((CycleGeometryData)data.geometryData).direction;
-                float r = ((CycleGeometryData)data.geometryData).r;
-
-                float randomX = Random.Range(-1.0f, 1.0f);
-                float randomY = Random.Range(-1.0f, 1.0f);
-                float z = (direction.x * randomX + direction.y * randomY) / direction.z;
+        // switch (data.geometryData.geometryType)
+        // {
+        //     case GeometryData.GeometryType.CONE :
+        //     {
                 
-                position = center + (new Vector3(randomX, randomY, z)).normalized * Random.Range(0, r);
-                velocity = direction * data.physicalData.speed;
-                break;
-            }
-            default :
-            {
-                position = center;
-                velocity = 
-                    (new Vector3(
-                        Random.Range(0.0f, 1.0f),
-                        Random.Range(-1.0f, 1.0f), 
-                        Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
-                break;
-            }
-        }
+        //         Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
+        //         // Debug.Log(direction);
+        //         float r = ((ConeGeometryData)data.geometryData).r;
+        //         float height = ((ConeGeometryData)data.geometryData).height;
+
+        //         position = center;
+        //         velocity = 
+        //             (direction * height + (Quaternion.AngleAxis(90, direction) * direction).normalized * Random.Range(0, r)).normalized
+        //             * data.physicalData.speed;
+        //         break;
+        //     }
+        //     case GeometryData.GeometryType.CYCLE :
+        //     {
+        //         Vector3 direction = ((CycleGeometryData)data.geometryData).direction;
+        //         float r = ((CycleGeometryData)data.geometryData).r;
+
+        //         float randomX = Random.Range(-1.0f, 1.0f);
+        //         float randomY = Random.Range(-1.0f, 1.0f);
+        //         float z = (direction.x * randomX + direction.y * randomY) / direction.z;
+                
+        //         position = center + (new Vector3(randomX, randomY, z)).normalized * Random.Range(0, r);
+        //         velocity = direction * data.physicalData.speed;
+        //         break;
+        //     }
+        //     default :
+        //     {
+        //         position = center;
+        //         velocity = 
+        //             (new Vector3(
+        //                 Random.Range(0.0f, 1.0f),
+        //                 Random.Range(-1.0f, 1.0f), 
+        //                 Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+        //         break;
+        //     }
+        // }
+        position = center;
+        velocity =
+            (new Vector3(
+                Random.Range(0.0f, 1.0f),
+                Random.Range(-1.0f, 1.0f),
+                Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+        // break;
 
         model.AddParticle(position, velocity);
         
-        GameObject particle = new GameObject();
-        particle.name = "particle" + generateIndex.ToString();
-        particle.transform.position = position;
-        particle.transform.SetParent(particleParent);
-        particleGameobjects.Add(particle);
-        generateIndex++;
+        // GameObject particle = new GameObject();
+        // particle.name = "particle" + generateIndex.ToString();
+        // particle.transform.position = position;
+        // particle.transform.SetParent(particleParent);
+        // particleGameobjects.Add(particle);
+        // generateIndex++;
     }
 
     void UpdateDensity()
