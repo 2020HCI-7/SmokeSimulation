@@ -278,7 +278,7 @@ public class FogController : MonoBehaviour
         ClearAccelerations();
 
         // for (int i = 0; i < Random.Range(0, 20); i++)
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 30; i++)
         {
             GenerateParticle();
         }
