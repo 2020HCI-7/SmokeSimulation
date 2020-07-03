@@ -222,13 +222,12 @@ public class GameManager : MonoBehaviour
         switch(type) {
             case Data.type.BARRIER: {
                 number = number + 1;
-                CubeGeometryData cubeGeometryData = new CubeGeometryData(
-                    new Vector3(0f, 0.5f, 0f),
-                    new Vector3(0.2f, 0.2f, 0.2f),
-                    new Vector3(0f, 0f, 0f)
+                SphereGeometryData sphereGeometryData = new SphereGeometryData(
+                    new Vector3(1f, 0.5f, 0f),
+                    0.5f
                 );
                 // Debug.Log(number);
-                objectData = new BarrierData(number, "Barrier" + number.ToString(), Data.type.BARRIER, true, cubeGeometryData);
+                objectData = new BarrierData(number, "Barrier" + number.ToString(), Data.type.BARRIER, true, sphereGeometryData);
                 break;
             }
             case Data.type.WIND: {
@@ -256,7 +255,7 @@ public class GameManager : MonoBehaviour
                     1000,
                     3f
                 );
-                objectData = new SmokeData(number, "Smoke" + number.ToString(), Data.type.SMOKE, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(0, 0, 0));
+                objectData = new SmokeData(number, "Smoke" + number.ToString(), Data.type.SMOKE, true, coneGeometryData, physicalData, SmokeData.SmokeType.SMOKE, new Color(1f, 1f, 1f));
                 break;
             }
             default : {
