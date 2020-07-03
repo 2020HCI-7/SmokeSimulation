@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SmokeController : MonoBehaviour
 {
+    public GameObject smokeSource;
+    
     private Dictionary<int, SmokeData> smokeObjectsData;
 
     private bool barrierDirtyFlag;//为true时表示数据为dirty
@@ -20,6 +22,11 @@ public class SmokeController : MonoBehaviour
     public void addObject(SmokeData data)
     {
         smokeObjectsData.Add(data.index, data);
+
+        GameObject go = Instantiate(smokeSource, data.geometryData.position, Quaternion.identity);
+        FogController fogC = go.GetComponent<FogController>();
+        // Debug.Log(fogC);
+        fogC.Init(data);
 
         switch (data.geometryData.geometryType)
         {

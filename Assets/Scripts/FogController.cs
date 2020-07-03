@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FogController : MonoBehaviour
 {
-    public static FogController instance;
 
     public float particleRadius = 0.025f;  // 流体粒子半径
 
@@ -17,9 +16,8 @@ public class FogController : MonoBehaviour
     // public float containerWidth = 100.0f;
     // public float containerDepth = 0.8f;
     // public float containerHeight = 4.0f;
-    public Vector3 center = Vector3.zero;
     public Vector3 maxSize = new Vector3(10.0f, 10.0f, 10.0f);
-    private float unitSize = 0.1f;
+    public float unitSize = 0.1f;
     // 烟雾源实例
     public FogModel model;
     public int m_velocityUpdateMethod = 0;
@@ -36,14 +34,33 @@ public class FogController : MonoBehaviour
     public int gs;
     public float rate = 10.0f;
     public Texture3D volume;
-    void Awake() {
-        if (instance != null)
-            Destroy(instance);
-        instance = this;
-    }
+    public Vector3 center = Vector3.zero;
+    public SmokeData data;
 
     // Start is called before the first frame update
     void Start()
+    {
+        // gs = (int)(maxSize.x / unitSize);
+        // windsize=10;
+        // windarray=new Vector4[windsize,windsize,windsize];
+        // for(int i=0;i<windsize;++i)
+        // {
+        //     for(int j=0;j<windsize;++j)
+        //     {
+                
+        //         for(int k=0;k<windsize;++k)
+        //         {
+        //             windarray[i,j,k]=new Vector4(0.0f,0.1f,0.0f,0.0f);
+        //         }
+        //     }
+        // }
+        // InitFogParticles();
+        // InitBoundary();
+    }
+
+    private bool isInit = false;
+
+    public void Init(SmokeData data)
     {
         gs = (int)(maxSize.x / unitSize);
         windsize=10;
@@ -61,14 +78,33 @@ public class FogController : MonoBehaviour
         }
         InitFogParticles();
         InitBoundary();
+        this.data = data;
+        this.center = data.geometryData.position;
+        isInit = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Step();
-        UpdateMat();
+        if (isInit)
+        {
+            // Debug.Log("step")
+            Step();
+            UpdateMat();
+        }
     }
+
+    private void OnDestory() {
+        XBuffer.Release();;
+        massBuffer.Release();;
+        boundaryXBuffer.Release();;
+        boundaryPsiBuffer.Release();;
+        numNeighborsBuffer.Release();;
+        neighborsBuffer.Release();;
+        densityBuffer.Release();;
+        lambdaBuffer.Release();;
+    }
+
     void UpdateMat()
     {
         var colors = new Color[gs * gs * gs];
@@ -102,7 +138,7 @@ public class FogController : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        /*for (int i = 0; i < particleGameobjects.Count; i++)
+        for (int i = 0; i < particleGameobjects.Count; i++)
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(particleGameobjects[i].transform.position, particleRadius);
@@ -113,7 +149,7 @@ public class FogController : MonoBehaviour
             // Gizmos.DrawCube(new Vector3(0, -containerHeight/2, 0), new Vector3(containerHeight, border, containerDepth));
             // Gizmos.DrawCube(new Vector3(0, 0, containerDepth/2), new Vector3(containerHeight, containerHeight, border));
             // Gizmos.DrawCube(new Vector3(0, 0, -containerDepth/2), new Vector3(containerHeight, containerHeight, border));
-        }*/
+        }
     }
 
 #region 初始化
@@ -133,7 +169,7 @@ public class FogController : MonoBehaviour
         // Utilities.ResizeList(fluidParticles, width * height * depth);
         // Utilities.ResizeList(particleGameobjects, width * height * depth);
 
-        particleParent = GameObject.Find("Particles").transform;
+        // particleParent = GameObject.Find("Particles").transform;
         // for (int i = 0; i < width; i++) {
         //     for (int j = 0; j < height; j++) {
         //         for (int k = 0; k < depth; k++) {
@@ -235,8 +271,6 @@ public class FogController : MonoBehaviour
         float h = Time.fixedDeltaTime;
         FogParticleData pd = model.particles;
 
-        //Debug.Log(h);
-
         ClearAccelerations();
 
         for (int i = 0; i < Random.Range(0, 20); i++)
@@ -253,7 +287,7 @@ public class FogController : MonoBehaviour
             pd.SetVelocity(i, velocity);
             Vector3 position = pd.GetPosition(i) + h * pd.GetVelocity(i);
             pd.SetPosition(i, position);
-            particleGameobjects[i].transform.position = position;
+            // particleGameobjects[i].transform.position = position;
             
             Vector3 delta = position - center;
             if (delta.x > maxSize.x/2 || delta.x < -maxSize.x/2 || 
@@ -261,8 +295,8 @@ public class FogController : MonoBehaviour
                 delta.z > maxSize.z/2 || delta.z < -maxSize.z/2)
             {
                 model.DeleteParticle(i);
-                Destroy(particleGameobjects[i]);
-                particleGameobjects.RemoveAt(i);
+                // Destroy(particleGameobjects[i]);
+                // particleGameobjects.RemoveAt(i);
                 i = i - 1;
             }
         }
@@ -299,7 +333,7 @@ public class FogController : MonoBehaviour
             Vector3 pos=pd.GetPosition(i);
             Vector4 windforce=windarray[(int)((pos.x+maxSize.x/2)/maxSize.x*windsize),(int)((pos.y+maxSize.y/2)/maxSize.y*windsize),(int)((pos.z+maxSize.z/2)/maxSize.z*windsize)];
             pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(windforce.x,windforce.y,windforce.z));
-            //pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.1f,0.0f));
+            pd.SetVelocity(i,pd.GetVelocity(i)+h*new Vector3(0.0f,0.1f,0.0f));
         }
         // ComputeXSPHViscosity();
         
@@ -308,17 +342,51 @@ public class FogController : MonoBehaviour
     
     void GenerateParticle()
     {
-        // float diam = 2.0f * particleRadius;
-        // float startX = -0.5f * containerWidth + diam;
-        // float startY = diam;
-        // float startZ = -0.5f * containerDepth + diam;
+        Vector3 position;
+        Vector3 velocity;
+        switch (data.geometryData.geometryType)
+        {
+            case GeometryData.GeometryType.CONE :
+            {
+                Vector3 direction = ((ConeGeometryData)data.geometryData).direction;
+                float r = ((ConeGeometryData)data.geometryData).r;
+                float height = ((ConeGeometryData)data.geometryData).height;
 
-        Vector3 position = center;
-        Vector3 velocity = 
-            (new Vector3(
-                Random.Range(0.0f, 1.0f),
-                Random.Range(-1.0f, 1.0f), 
-                Random.Range(-1.0f, 1.0f))).normalized * Random.Range(0, 0.5f);
+                float randomX = Random.Range(-1.0f, 1.0f);
+                float randomY = Random.Range(-1.0f, 1.0f);
+                float z = (direction.x * randomX + direction.y * randomY) / direction.z;
+
+                position = center;
+                velocity = 
+                    (direction * height + (new Vector3(randomX, randomY, z)).normalized * Random.Range(0, r)).normalized
+                    * data.physicalData.speed;
+                break;
+            }
+            case GeometryData.GeometryType.CYCLE :
+            {
+                Vector3 direction = ((CycleGeometryData)data.geometryData).direction;
+                float r = ((CycleGeometryData)data.geometryData).r;
+
+                float randomX = Random.Range(-1.0f, 1.0f);
+                float randomY = Random.Range(-1.0f, 1.0f);
+                float z = (direction.x * randomX + direction.y * randomY) / direction.z;
+                
+                position = center + (new Vector3(randomX, randomY, z)).normalized * Random.Range(0, r);
+                velocity = direction * data.physicalData.speed;
+                break;
+            }
+            default :
+            {
+                position = center;
+                velocity = 
+                    (new Vector3(
+                        Random.Range(0.0f, 1.0f),
+                        Random.Range(-1.0f, 1.0f), 
+                        Random.Range(-1.0f, 1.0f))).normalized * data.physicalData.speed;
+                break;
+            }
+        }
+
         model.AddParticle(position, velocity);
         
         GameObject particle = new GameObject();
