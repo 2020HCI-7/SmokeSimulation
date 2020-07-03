@@ -221,4 +221,9 @@ public class BarrierController : MonoBehaviour
     {
 
     }
+
+    public Dictionary<int, BarrierData> getBarrierData()
+    {
+        return barrierObjectsData;
+    }
 }

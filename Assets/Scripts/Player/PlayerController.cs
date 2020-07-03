@@ -73,4 +73,17 @@ public class PlayerController : MonoBehaviour
         }
         transform.localEulerAngles = new Vector3(0f, rotation.y, 0f);
     }
+
+    public Vector3 getFocus()
+    {
+        Vector3 position = transform.position;
+        float forward = 1f;
+        float height = forward * Mathf.Sin(rotation.x * Mathf.Deg2Rad);
+        float vertical = forward * Mathf.Cos(rotation.x * Mathf.Deg2Rad);
+        Vector3 returnPosition = new Vector3(position.x + vertical * Mathf.Sin(rotation.y * Mathf.Deg2Rad), position.y - height, position.z + vertical * Mathf.Cos(rotation.y * Mathf.Deg2Rad));
+        if (returnPosition.y < 0) {
+            returnPosition = new Vector3(returnPosition.x, 0f, returnPosition.z);
+        }
+        return returnPosition;
+    }
 }

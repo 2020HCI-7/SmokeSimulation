@@ -67,7 +67,7 @@ public class FogController : MonoBehaviour
         gsx = (int)(maxSize.x / unitSize);
         gsy = (int)(maxSize.y / unitSize);
         gsz = (int)(maxSize.z / unitSize);
-        windsize=10;
+        windsize=40;
         windarray=new Vector3[windsize,windsize,windsize];
         for(int i=0;i<windsize;++i)
         {
@@ -1068,6 +1068,11 @@ public class FogController : MonoBehaviour
     //     //float viscosity = model.
 
     // }
+    public int GetSmokeDensity(Vector3 position)
+    {
+        Vector3 delta = position - center + maxSize / 2.0f;
+        return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+    }
 
 #endregion
 
