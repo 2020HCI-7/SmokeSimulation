@@ -10,7 +10,9 @@ public class ObjectPanelController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        objectNumber = 0;
+        if(objectNumber <= 0) {
+            objectNumber = 0;
+        }
     }
 
     public void addObject(Data data)

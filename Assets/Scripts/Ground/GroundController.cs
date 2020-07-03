@@ -10,7 +10,9 @@ public class GroundController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        oldData = new GroundData(0, "", Data.type.GROUND, false, 0.0f);
+        if(oldData == null) {
+            oldData = new GroundData(0, "", Data.type.GROUND, false, 0.0f);
+        }
     }
 
     //methods
@@ -37,7 +39,7 @@ public class GroundController : MonoBehaviour
             //
             for (float i = lastSize; i < nowSize; i+=0.2f) {
                 float temp = i / 2 + 0.05f;
-                for (float k = 0; k < 2 * temp; k+=0.1f) {
+                for (float k = 0; k < 2 * temp - 0.01f; k+=0.1f) {
                     position = new Vector3(temp, 0, (-1) * temp + k);
                     unit = Instantiate(planeUnit, position, Quaternion.identity);
                     unit.transform.SetParent(transform);
@@ -52,25 +54,20 @@ public class GroundController : MonoBehaviour
                     unit.transform.SetParent(transform);
                 }
             }
+            // Debug.Log(transform.childCount);
             lastSize = nowSize;
             oldData.size = nowSize;
         }
         else if(nowSize < lastSize) {
-            float temp = nowSize / 2 - 0.05f;
+            int index = (int)((nowSize + 0.01f) / 0.1f) * (int)((nowSize + 0.01f) / 0.1f);
             //逆序遍历
-            for (int i = transform.childCount - 1; i > 0; i--)
+            for (int i = transform.childCount - 1; i >= index; i--)
             {
-                Transform unitTransform = transform.GetChild(i);
-                Vector3 position = unitTransform.position;
-                if(position.x > temp || position.x < (-1) * temp || position.z > temp || position.z < (-1) * temp){
-                    Destroy(unitTransform.gameObject);
-                }
-                else {
-                    break;//编号与位置正相关，编号越大越远离中心
-                }
+                Destroy(transform.GetChild(i).gameObject);
             }
             lastSize = nowSize;
             oldData.size = nowSize;
         }
+        // transform.position = new Vector3(0.0f, 0.0f, 0.0f);
     }
 }
