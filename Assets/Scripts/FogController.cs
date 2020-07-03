@@ -1057,6 +1057,11 @@ public class FogController : MonoBehaviour
     //     //float viscosity = model.
 
     // }
+    public int GetSmokeDensity(Vector3 position)
+    {
+        Vector3 delta = position - center + maxSize / 2.0f;
+        return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+    }
 
 #endregion
 
