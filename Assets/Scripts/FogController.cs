@@ -1122,8 +1122,42 @@ public class FogController : MonoBehaviour
     // }
     public int getSmokeDensity(Vector3 position)
     {
-        Vector3 delta = position - center + maxSize / 2.0f;
-        return density[(int)(delta.x / unitSize)][(int)(delta.y / unitSize)][(int)(delta.z / unitSize)];
+        Vector3 delta = position+new Vector3(0.50f,0.50f,0.50f);
+        Debug.Log(delta);
+        if(delta.x>=1||delta.x<0|| delta.y >= 1 || delta.y < 0|| delta.z >= 1 || delta.z < 0)
+        {
+            Debug.Log("out bound");
+            return 0;
+        }
+        int bound = 4;
+        int sum = 0;
+        for(int i=-1*bound;i<bound;++i)
+        {
+            for (int j = -1 * bound; j < bound; ++j)
+            {
+                for (int k = -1 * bound; k < bound; ++k)
+                {
+                    int px = i + (int)(delta.x * gsx);
+                    int py = j + (int)(delta.y * gsy);
+                    int pz = k + (int)(delta.z * gsz);
+                    if(px<0||px>=gsx||py<0||py>=gsy||pz<0||pz>=gsz)
+                    {
+                        continue;
+                    }
+                    sum += density[px][py][pz];
+                }
+            }
+        }
+        if(sum!=0)
+        {
+            return sum;
+        }
+        else
+        {
+            return ((int)(position.x*13+position.y*17+position.z*19))%10;
+        }
+        
+        
     }
 
     public void setWindArray(Vector3[,,] _windArray)
